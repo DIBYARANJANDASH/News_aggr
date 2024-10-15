@@ -21,13 +21,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/createUser")
     public UserEntity createUser(@RequestBody UserEntity user) {
         return userService.createUser(user);
     }
 
     @GetMapping("/{id}")
-    public Optional<UserEntity> getUserById(@PathVariable Long id) {
+    public Optional<UserEntity> getUserById(@PathVariable Integer id) {
         return userService.getUserById(id);
     }
 
@@ -37,12 +37,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserEntity updateUser(@PathVariable Long id, @RequestBody UserEntity updatedUser) {
+    public UserEntity updateUser(@PathVariable Integer id, @RequestBody UserEntity updatedUser) {
         return userService.updateUser(id, updatedUser);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
     }
 }

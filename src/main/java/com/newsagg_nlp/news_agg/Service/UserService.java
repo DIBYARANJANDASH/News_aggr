@@ -19,13 +19,13 @@ public class UserService {
     public UserEntity createUser(UserEntity user){ //creates a new user
         return userRepo.save(user);
     }
-    public Optional<UserEntity>getUserById(Long userId){// retrieves a user from database and returns optional object if not present
+    public Optional<UserEntity>getUserById(Integer userId){// retrieves a user from database and returns optional object if not present
         return userRepo.findById(userId);
     }
     public List<UserEntity> getAllUsers(){//fetch all users
         return userRepo.findAll();
     }
-    public UserEntity updateUser(Long userId, UserEntity updatedUser) {//update a user
+    public UserEntity updateUser(Integer userId, UserEntity updatedUser) {//update a user
         Optional<UserEntity> existingUser = userRepo.findById(userId);
 
         if (existingUser.isPresent()) {
@@ -38,7 +38,7 @@ public class UserService {
         }
         return null;
     }
-    public void deleteUser(Long userId){//deletes a user
+    public void deleteUser(Integer userId){//deletes a user
         userRepo.deleteById(userId);
     }
 
