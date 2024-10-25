@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity, Long> {
-    List<UserPreferencesEntity> findByUser_UserId(Long userId);
+    List<UserPreferencesEntity> findByUser_UserId(String userId);
 }
