@@ -3,6 +3,8 @@ package com.newsagg_nlp.news_agg.Controller;
 import com.newsagg_nlp.news_agg.Entity.ArticleEntity;
 import com.newsagg_nlp.news_agg.Service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +20,21 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
-    @GetMapping
+
+    @GetMapping("/articleSub")
     public List<ArticleEntity> getArticlesBySubcategory(@RequestParam Long subcategoryId) {
         return articleService.getArticlesBySubcategory(subcategoryId);
     }
 
-    @GetMapping("/fetch")
+    @PostMapping("/fetch")
     public List<ArticleEntity> fetchArticles(@RequestParam String category, @RequestParam String subcategory) {
-        return articleService.fetchArticlesFromApi(category, subcategory);
+        List<ArticleEntity> storeArticles = articleService.fetchArticlesFromApi(category, subcategory);
+        return new ResponseEntity<>(storeArticles, HttpStatus.CREATED).getBody();
     }
+    @GetMapping("/preferences/{userId}")
+    public ResponseEntity<List<ArticleEntity>> getArticlesByUserPreferences(@PathVariable Long userId) {
+        List<ArticleEntity> articles = articleService.getArticlesByUserPreferences(userId);
+        return ResponseEntity.ok(articles);
+    }
+
 }

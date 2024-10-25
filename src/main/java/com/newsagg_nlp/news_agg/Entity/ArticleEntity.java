@@ -1,14 +1,11 @@
 package com.newsagg_nlp.news_agg.Entity;
 
-import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-
 
 @Data
 @Document(collection = "articles")
@@ -18,14 +15,18 @@ public class ArticleEntity {
     private String title;
     private String description;
     private String content;
-
     private URL url;
     private URL imageUrl;
 
-    private String source;
+    private Source source;
     private LocalDateTime publishedAt;
     private String author;
-
     private Long subcategoryId;
 
+    // Nested Source class to match the API response structure
+    @Data
+    public static class Source {
+        private String id;
+        private String name;
+    }
 }

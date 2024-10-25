@@ -15,4 +15,6 @@ public class SubCategoryEntity {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategoryEntity category;
+
+
 }

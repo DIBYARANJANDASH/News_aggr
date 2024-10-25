@@ -18,7 +18,7 @@ public class UserPreferenceService {
     }
     // Get preferences for a user
     public List<UserPreferencesEntity> getPreferencesByUserId(Long userId) {
-        return userPreferenceRepo.findByUser_UserId(userId);
+        return userPreferenceRepo.findByUser_userId(userId);
     }
 
     // Delete user preferences by ID

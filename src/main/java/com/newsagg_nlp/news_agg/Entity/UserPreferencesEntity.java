@@ -18,7 +18,10 @@ public class UserPreferencesEntity {
     @JoinColumn(name = "userId")
     private UserEntity user;
 
-    private Long subcategoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategory_id")
+    private SubCategoryEntity subCategory;
+
     private int priority;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
