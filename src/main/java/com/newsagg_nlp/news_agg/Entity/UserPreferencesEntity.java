@@ -6,20 +6,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
 public class UserPreferencesEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long preferenceId;
+    @Column(name = "preference_id", columnDefinition = "CHAR(36)")
+    private String preferenceId = UUID.randomUUID().toString();;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id", columnDefinition = "CHAR(36)")
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subcategory_id")
+    @JoinColumn(name = "subcategory_id", columnDefinition = "CHAR(36)")
     private SubCategoryEntity subCategory;
 
     private int priority;

@@ -20,7 +20,7 @@ public class SubCategoryController {
     private SubCategoryService subCategoryService;
 
     @GetMapping("/subcategories/{categoryId}")
-    public ResponseEntity<List<SubCategoryEntity>> getSubCategories(@PathVariable Long categoryId) {
+    public ResponseEntity<List<SubCategoryEntity>> getSubCategories(@PathVariable String categoryId) {
         List<SubCategoryEntity> subCategories = subCategoryService.getSubCategoriesByCategory(categoryId);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }

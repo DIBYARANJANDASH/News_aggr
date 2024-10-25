@@ -21,7 +21,7 @@ public class ArticleEntity {
     private Source source;
     private LocalDateTime publishedAt;
     private String author;
-    private Long subcategoryId;
+    private String subcategoryId;
 
     // Nested Source class to match the API response structure
     @Data

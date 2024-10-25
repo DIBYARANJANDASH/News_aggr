@@ -14,7 +14,7 @@ public class SubCategoryService {
     @Autowired
     private SubCategoryRepo subCategoryRepo;
 
-    public List<SubCategoryEntity> getSubCategoriesByCategory(Long categoryId) {
+    public List<SubCategoryEntity> getSubCategoriesByCategory(String categoryId) {
         CategoryEntity category = new CategoryEntity();
 //        category.setId(categoryId);
         return subCategoryRepo.findByCategory(category);    }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity, Long> {
+public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity, String> {
 
-    List<UserPreferencesEntity> findByUser_userId(Long userId);
+    List<UserPreferencesEntity> findByUser_userId(String userId);
 }

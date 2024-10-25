@@ -22,7 +22,7 @@ public class ArticleController {
 
 
     @GetMapping("/articleSub")
-    public List<ArticleEntity> getArticlesBySubcategory(@RequestParam Long subcategoryId) {
+    public List<ArticleEntity> getArticlesBySubcategory(@RequestParam String subcategoryId) {
         return articleService.getArticlesBySubcategory(subcategoryId);
     }
 
@@ -32,7 +32,7 @@ public class ArticleController {
         return new ResponseEntity<>(storeArticles, HttpStatus.CREATED).getBody();
     }
     @GetMapping("/preferences/{userId}")
-    public ResponseEntity<List<ArticleEntity>> getArticlesByUserPreferences(@PathVariable Long userId) {
+    public ResponseEntity<List<ArticleEntity>> getArticlesByUserPreferences(@PathVariable String userId) {
         List<ArticleEntity> articles = articleService.getArticlesByUserPreferences(userId);
         return ResponseEntity.ok(articles);
     }

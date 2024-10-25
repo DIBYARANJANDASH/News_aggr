@@ -17,12 +17,12 @@ public class UserPreferenceService {
         return userPreferenceRepo.save(userPreferences);
     }
     // Get preferences for a user
-    public List<UserPreferencesEntity> getPreferencesByUserId(Long userId) {
+    public List<UserPreferencesEntity> getPreferencesByUserId(String userId) {
         return userPreferenceRepo.findByUser_userId(userId);
     }
 
     // Delete user preferences by ID
-    public void deleteUserPreferences(Long preferenceId) {
+    public void deleteUserPreferences(String preferenceId) {
         userPreferenceRepo.deleteById(preferenceId);
     }
 

@@ -22,11 +22,12 @@ public class ArticleService {
     private final ArticleRepo articleRepo;
     private final SubCategoryRepo subCategoryRepo;
     private final UserPreferenceRepo userPreferenceRepo;
-    private final RestTemplate restTemplate;
     private final UserRepo userRepo;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public ArticleService(ArticleRepo articleRepo, SubCategoryRepo subCategoryRepo, RestTemplate restTemplate, UserPreferenceRepo userPreferenceRepo, UserRepo userRepo) {
+    public ArticleService(ArticleRepo articleRepo, SubCategoryRepo subCategoryRepo, RestTemplate restTemplate,
+                          UserPreferenceRepo userPreferenceRepo, UserRepo userRepo) {
         this.articleRepo = articleRepo;
         this.subCategoryRepo = subCategoryRepo;
         this.restTemplate = restTemplate;
@@ -50,7 +51,7 @@ public class ArticleService {
 
             // Fetch the subcategory entity from the database
             SubCategoryEntity subCategoryEntity = subCategoryRepo.findBySubcategoryName(subcategory);
-            Long subcategoryId = (subCategoryEntity != null) ? subCategoryEntity.getSubcategoryId() : null;
+            String subcategoryId = (subCategoryEntity != null) ? subCategoryEntity.getSubcategoryId() : null;
 
             if (subcategoryId == null) {
                 System.out.println("Subcategory ID not found for: " + subcategory);
@@ -68,7 +69,7 @@ public class ArticleService {
         return null;
     }
 
-    public List<ArticleEntity> getArticlesByUserPreferences(Long userId) {
+    public List<ArticleEntity> getArticlesByUserPreferences(String userId) {
         // Fetch the user
         UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -77,8 +78,8 @@ public class ArticleService {
         List<UserPreferencesEntity> userPreferences = userPreferenceRepo.findByUser_userId(userId);
 
         // Extract subcategory IDs from preferences
-        List<Integer> subCategoryIds = userPreferences.stream()
-                .map(preference -> preference.getSubCategory().getSubcategoryId().intValue())
+        List<String> subCategoryIds = userPreferences.stream()
+                .map(preference -> preference.getSubCategory().getSubcategoryId())
                 .collect(Collectors.toList());
 
         // Fetch articles from MongoDB based on subcategory IDs
@@ -90,7 +91,7 @@ public class ArticleService {
      * @param subcategoryId The subcategory ID to filter articles.
      * @return List of articles filtered by subcategory.
      */
-    public List<ArticleEntity> getArticlesBySubcategory(Long subcategoryId) {
+    public List<ArticleEntity> getArticlesBySubcategory(String subcategoryId) {
         return articleRepo.findBySubcategoryId(subcategoryId);
     }
 }

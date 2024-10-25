@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface ArticleRepo extends MongoRepository<ArticleEntity, String> {
-    List<ArticleEntity> findBySubcategoryId(Long subcategoryId);
+    List<ArticleEntity> findBySubcategoryId(String subcategoryId);
 
-    List<ArticleEntity> findBySubcategoryIdIn(List<Integer> subcategoryIds);
+    List<ArticleEntity> findBySubcategoryIdIn(List<String> subcategoryIds);
 }
