@@ -5,6 +5,7 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
+import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,27 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public UserService(UserRepo userRepo) {
+    public UserService(UserRepo userRepo, Crypt crypt) {
         this.userRepo = userRepo;
+        this.crypt = crypt;
+    }
+
+    private final Crypt crypt;
+
+    public String encryptPassword(String password) {
+        try {
+            return crypt.encryptDataAES(password);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to encrypt password", e);
+        }
+    }
+
+    public String decryptPassword(String encryptedPassword) {
+        try {
+            return crypt.decryptDataAES(encryptedPassword);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to decrypt password", e);
+        }
     }
 
     //CRUD OPERATIONS
