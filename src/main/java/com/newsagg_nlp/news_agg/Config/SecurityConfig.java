@@ -40,7 +40,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**","/loginUser").permitAll()
+                        .requestMatchers("/api/users/**","/api/categories/**","/api/subcategories/**","/api/articles/**","/api/preferences/**","/loginUser, /**/*.html,/**/*.css, /**/*.js, /images/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

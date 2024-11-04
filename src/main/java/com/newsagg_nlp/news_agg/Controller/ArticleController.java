@@ -1,7 +1,9 @@
 package com.newsagg_nlp.news_agg.Controller;
 
 import com.newsagg_nlp.news_agg.Entity.ArticleEntity;
+import com.newsagg_nlp.news_agg.Entity.UserPreferencesEntity;
 import com.newsagg_nlp.news_agg.Service.ArticleService;
+import com.newsagg_nlp.news_agg.Service.UserPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +13,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles")
+@CrossOrigin(origins = "http://localhost:63342")
 public class ArticleController {
 
     private final ArticleService articleService;
 
     @Autowired
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(ArticleService articleService, UserPreferenceService userPreferenceService) {
         this.articleService = articleService;
     }
 
@@ -36,5 +39,6 @@ public class ArticleController {
         List<ArticleEntity> articles = articleService.getArticlesByUserPreferences(userId);
         return ResponseEntity.ok(articles);
     }
+
 
 }

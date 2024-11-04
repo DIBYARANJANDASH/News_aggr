@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:63342")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/createUser")
-    public UserEntity createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<?> createUser(@RequestBody UserEntity user) {
         return userService.createUser(user);
     }
 

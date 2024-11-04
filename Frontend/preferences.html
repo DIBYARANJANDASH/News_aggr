@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Preferences</title>
+  <link rel="stylesheet" href="preference.css">
+</head>
+<body>
+<div class="preferences-container">
+  <h2>Select Your Preferences</h2>
+  <form id="preferences-form">
+    <label for="category">Category</label>
+    <select id="category" onchange="loadSubcategories()">
+      <option value="">Select a Category</option>
+    </select>
+
+    <label for="subcategory">Subcategory</label>
+    <select id="subcategory">
+      <option value="">Select a Subcategory</option>
+    </select>
+
+
+    <button type="button" onclick="savePreferences()">Save Preference</button>
+
+    <button id="showNewsFeedButton" type="button" onclick="redirectToNewsFeed()">Show News Feed</button>
+  </form>
+  <div id="message" class="message"></div>
+</div>
+
+<script src="preference.js"></script>
+</body>
+</html>

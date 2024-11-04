@@ -50,7 +50,7 @@ public class UserService {
     }
 
     //CRUD OPERATIONS
-    public UserEntity createUser(UserEntity user) { //creates a new user
+    public ResponseEntity<?> createUser(UserEntity user) { //creates a new user
 
         UserEntity newUser = new UserEntity();
         newUser.setEmail(user.getEmail());
@@ -60,7 +60,8 @@ public class UserService {
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        return userRepo.save(newUser);
+        UserEntity savedUser =  userRepo.save(newUser);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     public Optional<UserEntity> getUserById(String userId) {// retrieves a user from database and returns optional object if not present
