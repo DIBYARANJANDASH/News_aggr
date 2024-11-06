@@ -1,14 +1,4 @@
 const apiUrl = "http://localhost:8080/api";
-<<<<<<< HEAD
-
-// Fetch articles based on user preferences
-function fetchArticles() {
-    const userId = localStorage.getItem("userId");
-
-    fetch(`${apiUrl}/articles/preferences/${userId}`, {
-        headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-=======
 const userId = localStorage.getItem("userId");
 const token = localStorage.getItem("token");
 console.log(token)
@@ -23,7 +13,6 @@ function fetchArticles() {
     fetch(`${apiUrl}/articles/preferences/${userId}`, {
         headers: {
             "Authorization": `Bearer ${token}`
->>>>>>> main
         }
     })
     .then(response => {
@@ -33,23 +22,6 @@ function fetchArticles() {
         return response.json();
     })
     .then(articles => {
-<<<<<<< HEAD
-        const newsContainer = document.getElementById("news-container");
-        newsContainer.innerHTML = "";
-
-        articles.forEach(article => {
-            const articleElement = document.createElement("div");
-            articleElement.classList.add("article");
-            articleElement.innerHTML = `
-                <h2>${article.title}</h2>
-                <p>${article.description}</p>
-                <a href="${article.url}" target="_blank">Read more</a>
-            `;
-            newsContainer.appendChild(articleElement);
-        });
-    })
-    .catch(error => console.error("Fetch Articles Error:", error));
-=======
         displayArticles(articles);
     })
     .catch(error => {
@@ -83,7 +55,6 @@ function displayArticles(articles) {
 
         newsContainer.appendChild(articleCard);
     });
->>>>>>> main
 }
 
 // Call fetchArticles on page load
