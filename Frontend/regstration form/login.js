@@ -60,7 +60,7 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
 
   const encryptedPassword = encryptPassword(password);
 
-
+console.log(encryptedPassword);
   // Check if all fields are filled
   if (!username || !email || !password || !firstname || !lastname) {
     displayError("error-message2", "Please fill in all fields.");
@@ -71,7 +71,7 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
   fetch(`${apiUrl}/users/createUser`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, firstname, lastname, email, password})
+    body: JSON.stringify({ username, firstname, lastname, email, password:encryptedPassword})
   })
     .then((response) => {
       if (response.status === 409) {
@@ -93,19 +93,7 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
     });
 });
 
-// function encryptPassword(password) {
-//   const key = CryptoJS.enc.Utf8.parse("1234567812345678"); // Replace with a secure key
-//   const iv = CryptoJS.enc.Utf8.parse("1234567812345678");  // Replace with a secure IV
 
-//   const encrypted = CryptoJS.AES.encrypt(password, key, {
-//     iv: iv,
-//     mode: CryptoJS.mode.CBC,
-//     padding: CryptoJS.pad.Pkcs7
-//   });
-//   console.log(encrypted);
-
-//   return encrypted.toString(); // Returns the encrypted password as a string
-// }
 
 // Utility function to display error messages
 function displayError(elementId, message) {
@@ -113,4 +101,51 @@ function displayError(elementId, message) {
   errorElement.textContent = message;
   errorElement.style.display = "block";
 }
+
+
+/* const encryptPassword = (plainText) => {
+  const secretKey = "9861104726"; // Ensure this matches the backend
+  const salt = CryptoJS.lib.WordArray.random(128 / 8);
+  const key = CryptoJS.PBKDF2(secretKey, salt, { keySize: 256 / 32, iterations: 1000 });
+  const iv = CryptoJS.lib.WordArray.random(128 / 8);
+
+  console.log(secretKey);
+console.log(salt);
+console.log(key);
+console.log(iv);
+
+  const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv });
+  const cipherText = CryptoJS.enc.Base64.stringify(salt) + ":" +
+                     CryptoJS.enc.Base64.stringify(iv) + ":" +
+                     encrypted.toString();
+
+  return cipherText;
+}; */
+
+
+const encryptPassword = (plainText) => {
+  const secretKey = "9861104726"; // Ensure this matches the backend
+  const salt = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes salt
+  const key = CryptoJS.PBKDF2(secretKey, salt, { keySize: 256 / 32, iterations: 1000 });
+  const iv = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes IV
+
+  console.log("Secret Key:", secretKey);
+  console.log("Salt (Base64):", CryptoJS.enc.Base64.stringify(salt));
+  console.log("Key (Hex):", key.toString(CryptoJS.enc.Hex));
+  console.log("IV (Base64):", CryptoJS.enc.Base64.stringify(iv));
+
+  // Encrypt with AES-CBC using generated key and IV
+  const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv, padding: CryptoJS.pad.Pkcs7 });
+
+  // Format the output: salt:iv:ciphertext
+  const cipherText = CryptoJS.enc.Base64.stringify(salt) + ":" +
+                     CryptoJS.enc.Base64.stringify(iv) + ":" +
+                     encrypted.toString();
+
+  return cipherText;
+};
+
+// Example usage
+// Uncomment the line below to test the function with an example password
+// console.log(encryptPassword("your_password_here"));
 
