@@ -18,31 +18,37 @@ function displayError(elementId, message) {
   errorMessageDiv.textContent = message;
 }
 
+
 // Login Function
 document.getElementById("loginForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-  fetch(`${apiUrl}/users/loginUser`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  })
+    fetch(`${apiUrl}/users/loginUser`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    })
     .then((response) => {
-      if (!response.ok) {
-        throw new Error("Invalid username or password");
-      }
-      return response.json();
+        if (!response.ok) {
+            throw new Error("Invalid username or password");
+        }
+        return response.json();
     })
     .then((data) => {
-      localStorage.setItem("userId", data.userId);
-      window.location.href = "newsFeed.html";
+        if (data.userId && data.jwtToken) {
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("token", data.jwtToken);
+            window.location.href = "newsFeed.html";
+        } else {
+            console.error("Missing userId or token in login response");
+        }
     })
     .catch((error) => {
-      console.error("Login Error:", error);
-      displayError("error-message", error.message);
+        console.error("Login Error:", error);
+        displayError("error-message", error.message);
     });
 });
 

@@ -112,8 +112,13 @@ public class UserService {
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
+        String username=userDetails.getUsername();
+       UserEntity user = userRepo.findByUsername(userDetails.getUsername());
 
-        LoginResponse response = new LoginResponse(userDetails.getUsername(), jwtToken);
+       String userId=user.getUserId();
+
+
+        LoginResponse response = new LoginResponse(username, jwtToken,userId);
 
         return ResponseEntity.ok(response);
     }
