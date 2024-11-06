@@ -5,7 +5,7 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
-import com.newsagg_nlp.news_agg.utils.Crypt;
+//import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,31 +46,31 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public UserService(UserRepo userRepo, Crypt crypt) {
+    public UserService(UserRepo userRepo) {
         this.userRepo = userRepo;
-        this.crypt = crypt;
+//        this.crypt = crypt;
     }
 
-    private final Crypt crypt;
-
-    public String encryptPassword(String password) {
-        try {
-            return crypt.encryptDataAES(password);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to encrypt password", e);
-        }
-    }
-
-    public String decryptPassword(String encryptedPassword) {
-        try {
-            return crypt.decryptDataAES(encryptedPassword);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to decrypt password", e);
-        }
-    }
+//    private final Crypt crypt;
+//
+//    public String encryptPassword(String password) {
+//        try {
+//            return crypt.encryptDataAES(password);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to encrypt password", e);
+//        }
+//    }
+//
+//    public String decryptPassword(String encryptedPassword) {
+//        try {
+//            return crypt.decryptDataAES(encryptedPassword);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to decrypt password", e);
+//        }
+//    }
 
     //CRUD OPERATIONS
-    public UserEntity createUser(UserEntity user) { //creates a new user
+    public ResponseEntity<?> createUser(UserEntity user) { //creates a new user
 
         UserEntity newUser = new UserEntity();
         newUser.setEmail(user.getEmail());
@@ -80,7 +80,8 @@ public class UserService {
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        return userRepo.save(newUser);
+        UserEntity savedUser =  userRepo.save(newUser);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     public Optional<UserEntity> getUserById(String userId) {// retrieves a user from database and returns optional object if not present
@@ -131,8 +132,13 @@ public class UserService {
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
+        String username=userDetails.getUsername();
+       UserEntity user = userRepo.findByUsername(userDetails.getUsername());
 
-        LoginResponse response = new LoginResponse(userDetails.getUsername(), jwtToken);
+       String userId=user.getUserId();
+
+
+        LoginResponse response = new LoginResponse(username, jwtToken,userId);
 
         return ResponseEntity.ok(response);
     }

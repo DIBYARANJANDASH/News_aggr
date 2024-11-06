@@ -1,12 +1,15 @@
 package com.newsagg_nlp.news_agg.dto;
 
 public class LoginResponse {
+
     private String jwtToken;
     private String username;
+    private  String userId;
 
-    public LoginResponse(String username, String jwtToken) {
+    public LoginResponse(String username, String jwtToken,String userId) {
         this.username = username;
         this.jwtToken = jwtToken;
+        this.userId=userId;
     }
 
     public String getJwtToken() {
@@ -25,4 +28,7 @@ public class LoginResponse {
         this.username = username;
     }
 
+    public String getUserId() {return userId;}
+
+    public void setUserId(String userId) {this.userId = userId;}
 }

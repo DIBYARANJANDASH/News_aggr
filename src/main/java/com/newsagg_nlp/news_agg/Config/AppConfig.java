@@ -1,4 +1,4 @@
-package com.newsagg_nlp.news_agg.Service;
+package com.newsagg_nlp.news_agg.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
