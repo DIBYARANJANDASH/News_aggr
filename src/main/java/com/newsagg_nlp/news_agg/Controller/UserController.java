@@ -4,7 +4,6 @@ package com.newsagg_nlp.news_agg.Controller;
 import com.newsagg_nlp.news_agg.Entity.UserEntity;
 import com.newsagg_nlp.news_agg.Service.UserService;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "http://127.0.0.1:5500/loginpage/login.html?")
+@CrossOrigin(origins = "http://localhost:63342")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity<?> createUser(@RequestBody UserEntity user) throws Exception {
+    public ResponseEntity<?> createUser(@RequestBody UserEntity user) {
         return userService.createUser(user);
     }
 

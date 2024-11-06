@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "http://localhost:63342")
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -34,11 +34,14 @@ public class ArticleController {
         List<ArticleEntity> storeArticles = articleService.fetchArticlesFromApi(category, subcategory);
         return new ResponseEntity<>(storeArticles, HttpStatus.CREATED).getBody();
     }
+
     @GetMapping("/preferences/{userId}")
     public ResponseEntity<List<ArticleEntity>> getArticlesByUserPreferences(@PathVariable String userId) {
         List<ArticleEntity> articles = articleService.getArticlesByUserPreferences(userId);
+        if (articles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(articles);
+        }
         return ResponseEntity.ok(articles);
     }
-
-
 }
+

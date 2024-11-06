@@ -5,7 +5,7 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
-import lombok.SneakyThrows;
+//import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
-
 
 @Service
 public class UserService {
@@ -52,9 +50,7 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-
     //CRUD OPERATIONS
-    @SneakyThrows
     public ResponseEntity<?> createUser(UserEntity user) { //creates a new user
 
 //        System.out.println(user.getPassword());
@@ -68,7 +64,6 @@ public class UserService {
 //        System.out.println("User entity: " + user.toString());
 
 
-
         UserEntity newUser = new UserEntity();
         newUser.setEmail(user.getEmail());
         newUser.setFirstname(user.getFirstname());
@@ -80,7 +75,6 @@ public class UserService {
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
         UserEntity savedUser =  userRepo.save(newUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-
     }
 
     public Optional<UserEntity> getUserById(String userId) {// retrieves a user from database and returns optional object if not present
@@ -131,8 +125,13 @@ public class UserService {
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
+        String username=userDetails.getUsername();
+       UserEntity user = userRepo.findByUsername(userDetails.getUsername());
 
-        LoginResponse response = new LoginResponse(userDetails.getUsername(), jwtToken);
+       String userId=user.getUserId();
+
+
+        LoginResponse response = new LoginResponse(username, jwtToken,userId);
 
         return ResponseEntity.ok(response);
     }
