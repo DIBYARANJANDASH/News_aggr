@@ -5,7 +5,7 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
-import com.newsagg_nlp.news_agg.utils.Crypt;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+//import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
+
 
 @Service
 public class UserService {
@@ -46,31 +48,26 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public UserService(UserRepo userRepo, Crypt crypt) {
+    public UserService(UserRepo userRepo) {
         this.userRepo = userRepo;
-        this.crypt = crypt;
     }
 
-    private final Crypt crypt;
-
-    public String encryptPassword(String password) {
-        try {
-            return crypt.encryptDataAES(password);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to encrypt password", e);
-        }
-    }
-
-    public String decryptPassword(String encryptedPassword) {
-        try {
-            return crypt.decryptDataAES(encryptedPassword);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to decrypt password", e);
-        }
-    }
 
     //CRUD OPERATIONS
-    public UserEntity createUser(UserEntity user) { //creates a new user
+    @SneakyThrows
+    public ResponseEntity<?> createUser(UserEntity user) { //creates a new user
+
+//        System.out.println(user.getPassword());
+//        String encryptedPassword = user.getPassword();
+//        System.out.println(encryptedPassword);
+//        String secretKey = "9861104726";
+//        String decryptedPassword = decrypt(encryptedPassword, secretKey);
+//
+//        System.out.println("Decrypted Password: " + decryptedPassword);
+//
+//        System.out.println("User entity: " + user.toString());
+
+
 
         UserEntity newUser = new UserEntity();
         newUser.setEmail(user.getEmail());
@@ -78,9 +75,12 @@ public class UserService {
         newUser.setLastname(user.getLastname());
         newUser.setUsername(user.getUsername());
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+//        newUser.setPassword(passwordEncoder.encode(decryptedPassword));
         newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        return userRepo.save(newUser);
+        UserEntity savedUser =  userRepo.save(newUser);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+
     }
 
     public Optional<UserEntity> getUserById(String userId) {// retrieves a user from database and returns optional object if not present

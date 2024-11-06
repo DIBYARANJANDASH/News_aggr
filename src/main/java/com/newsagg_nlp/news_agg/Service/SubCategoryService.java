@@ -16,6 +16,6 @@ public class SubCategoryService {
 
     public List<SubCategoryEntity> getSubCategoriesByCategory(String categoryId) {
         CategoryEntity category = new CategoryEntity();
-//        category.setId(categoryId);
+        category.setCategoryId(categoryId);
         return subCategoryRepo.findByCategory(category);    }
 }

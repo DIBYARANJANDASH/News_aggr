@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-//@CrossOrigin(origins = "http://127.0.0.1:5500/loginpage/login.html?")
-@CrossOrigin(origins = "*", allowedHeaders= "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -27,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/createUser")
-    public UserEntity createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<?> createUser(@RequestBody UserEntity user) throws Exception {
         return userService.createUser(user);
     }
 
