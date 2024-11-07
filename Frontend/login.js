@@ -95,23 +95,23 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
 });
 
 // Password Encryption Function
-const encryptPassword = (plainText) => {
-  const secretKey = "123"; // Ensure this matches the backend
- console.log( typeof(secretKey))
-  const salt = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes salt
-  const key = CryptoJS.PBKDF2(secretKey, salt, { keySize: 256 / 32, iterations: 1000 });
-  const iv = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes IV
-  console.log("Secret Key:", secretKey);
-  console.log("Salt (Base64):", CryptoJS.enc.Base64.stringify(salt));
-  console.log("Key (Hex):", key.toString(CryptoJS.enc.Hex));
-  console.log("IV (Base64):", CryptoJS.enc.Base64.stringify(iv));
-  
-  // Encrypt with AES-CBC using generated key and IV
-  const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv, padding: CryptoJS.pad.Pkcs7 });
-  
-  // Format the output: salt:iv:ciphertext
-  const cipherText = CryptoJS.enc.Base64.stringify(salt) + ":" +
-                     CryptoJS.enc.Base64.stringify(iv) + ":" +
-                     encrypted.toString();
-  return cipherText;
-};
+//const encryptPassword = (plainText) => {
+//  const secretKey = "123"; // Ensure this matches the backend
+// console.log( typeof(secretKey))
+//  const salt = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes salt
+//  const key = CryptoJS.PBKDF2(secretKey, salt, { keySize: 256 / 32, iterations: 1000 });
+//  const iv = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes IV
+//  console.log("Secret Key:", secretKey);
+//  console.log("Salt (Base64):", CryptoJS.enc.Base64.stringify(salt));
+//  console.log("Key (Hex):", key.toString(CryptoJS.enc.Hex));
+//  console.log("IV (Base64):", CryptoJS.enc.Base64.stringify(iv));
+//
+//  // Encrypt with AES-CBC using generated key and IV
+//  const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv, padding: CryptoJS.pad.Pkcs7 });
+//
+//  // Format the output: salt:iv:ciphertext
+//  const cipherText = CryptoJS.enc.Base64.stringify(salt) + ":" +
+//                     CryptoJS.enc.Base64.stringify(iv) + ":" +
+//                     encrypted.toString();
+//  return cipherText;
+//};
