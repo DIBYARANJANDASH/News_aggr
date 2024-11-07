@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>News Feed</title>
-    <link rel="stylesheet" href="article.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News App</title>
+    <!-- Google Fonts -->
+    <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+            rel="stylesheet"
+    />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="article.css" />
 </head>
 <body>
-<header>
-    <h1>Your News Feed</h1>
-    <p>Based on your selected preferences</p>
-</header>
-<main id="news-container" class="news-container">
-    <!-- Articles will be dynamically inserted here -->
-</main>
-<script src="article.js" defer></script>
+<div class="heading-container">
+    <h4>News Website</h4>
+    <div class="auth-buttons">
+        <a href="login.html"><button class="login-btn">Login</button></a>
+    </div>
+</div>
+<div class="options-container"></div>
+<div id="news-container" class="news-container"></div>
+
+<!-- Script -->
+<script src="article.js"></script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 const apiUrl = "http://localhost:8080/api";
 const userId = localStorage.getItem("userId");
 const token = localStorage.getItem("token");
-console.log(token)
-function fetchArticles() {
-    const token = localStorage.getItem("token"); // Retrieve token here
 
+console.log("Token:", token);
+
+function fetchArticles() {
     if (!userId || !token) {
         console.error("No user ID or token found. Please log in.");
         return;
@@ -30,10 +30,9 @@ function fetchArticles() {
     });
 }
 
-
 function displayArticles(articles) {
     const newsContainer = document.getElementById("news-container");
-    newsContainer.innerHTML = ""; // Clear previous articles
+    newsContainer.innerHTML = ""; // Clear previous content
 
     if (articles.length === 0) {
         newsContainer.innerHTML = "<p>No articles found for your preferences.</p>";
@@ -42,15 +41,21 @@ function displayArticles(articles) {
 
     articles.forEach(article => {
         const articleCard = document.createElement("div");
-        articleCard.classList.add("article-card");
+        articleCard.classList.add("news-card");
 
         articleCard.innerHTML = `
-            <h2>${article.title}</h2>
-            <p><strong>Source:</strong> ${article.source ? article.source.name : "Unknown"}</p>
-            <p><strong>Published At:</strong> ${new Date(article.publishedAt).toLocaleDateString()}</p>
-            <p>${article.description}</p>
-            <p><strong>Author:</strong> ${article.author || "Unknown"}</p>
-            <a href="${article.url}" target="_blank">Read more</a>
+            <div class="news-image-container">
+                <img src="${article.urlToImage || "./newspaper.jpg"}" alt="" />
+            </div>
+            <div class="news-content">
+                <div class="news-title">
+                    ${article.title}
+                </div>
+                <div class="news-description">
+                    ${article.description || article.content || ""}
+                </div>
+                <a href="${article.url}" target="_blank" class="view-button">Read More</a>
+            </div>
         `;
 
         newsContainer.appendChild(articleCard);

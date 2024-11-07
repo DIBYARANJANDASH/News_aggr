@@ -4,6 +4,7 @@ import com.newsagg_nlp.news_agg.Entity.UserEntity;
 import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
+import com.newsagg_nlp.news_agg.dto.SignupRequest;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
 //import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
+
 
 @Service
 public class UserService {
@@ -48,39 +51,30 @@ public class UserService {
 
     public UserService(UserRepo userRepo) {
         this.userRepo = userRepo;
-//        this.crypt = crypt;
     }
 
-//    private final Crypt crypt;
-//
-//    public String encryptPassword(String password) {
-//        try {
-//            return crypt.encryptDataAES(password);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to encrypt password", e);
-//        }
-//    }
-//
-//    public String decryptPassword(String encryptedPassword) {
-//        try {
-//            return crypt.decryptDataAES(encryptedPassword);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to decrypt password", e);
-//        }
-//    }
 
     //CRUD OPERATIONS
-    public ResponseEntity<?> createUser(UserEntity user) { //creates a new user
+    public ResponseEntity<?> createUser(SignupRequest signupRequest) throws Exception { //creates a new user
+
+        String encryptedPassword = signupRequest.getPassword();
+        System.out.println("encrypt"+encryptedPassword);
+        String secretKey = "123";
+
+        String decryptedPassword = decrypt(encryptedPassword, secretKey);;
+
+        System.out.println("Decrypted Password: " + decryptedPassword);
 
         UserEntity newUser = new UserEntity();
-        newUser.setEmail(user.getEmail());
-        newUser.setFirstname(user.getFirstname());
-        newUser.setLastname(user.getLastname());
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setEmail(signupRequest.getEmail());
+        newUser.setFirstname(signupRequest.getFirstname());
+        newUser.setLastname(signupRequest.getLastname());
+        newUser.setUsername(signupRequest.getUsername());
+//        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setPassword(passwordEncoder.encode(decryptedPassword));
         newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        UserEntity savedUser =  userRepo.save(newUser);
+        UserEntity savedUser = userRepo.save(newUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
