@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
 
+//import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
+
 
 @Service
 public class UserService {
@@ -58,10 +60,9 @@ public class UserService {
     public ResponseEntity<?> createUser(SignupRequest signupRequest) throws Exception { //creates a new user
 
         String encryptedPassword = signupRequest.getPassword();
-        System.out.println("encrypt"+encryptedPassword);
         String secretKey = "123";
 
-        String decryptedPassword = decrypt(encryptedPassword, secretKey);;
+        String decryptedPassword = decrypt(encryptedPassword, secretKey);
 
         System.out.println("Decrypted Password: " + decryptedPassword);
 
@@ -108,11 +109,19 @@ public class UserService {
 
 
 
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws Exception {
         Authentication authentication;
+
+        String encryptedPassword = loginRequest.getPassword();
+        String secretKey = "123";
+
+        System.out.println(encryptedPassword);
+        String decryptedPassword = decrypt(encryptedPassword, secretKey);
+
+        System.out.println("Decrypted Password: " + decryptedPassword);
         try {
             authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), decryptedPassword));
         } catch (AuthenticationException exception) {
             Map<String, Object> map = new HashMap<>();
             map.put("message", "Bad credentials");
@@ -127,9 +136,9 @@ public class UserService {
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
         String username=userDetails.getUsername();
-       UserEntity user = userRepo.findByUsername(userDetails.getUsername());
+        UserEntity user = userRepo.findByUsername(userDetails.getUsername());
 
-       String userId=user.getUserId();
+        String userId=user.getUserId();
 
 
         LoginResponse response = new LoginResponse(username, jwtToken,userId);

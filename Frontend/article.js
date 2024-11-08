@@ -45,7 +45,8 @@ function displayArticles(articles) {
 
         articleCard.innerHTML = `
             <div class="news-image-container">
-                <img src="${article.urlToImage || "./newspaper.jpg"}" alt="" />
+                <img src="${article.image}" alt="News Image" />
+
             </div>
             <div class="news-content">
                 <div class="news-title">

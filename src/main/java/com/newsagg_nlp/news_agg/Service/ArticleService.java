@@ -66,7 +66,7 @@ public class ArticleService {
         }
 
         // If data is outdated, fetch new articles from the API
-        String apiUrl = "https://newsapi.org/v2/everything?q=" + subcategory + "&apiKey=c9ecc1e54c544dfa9ffef750dbcc6251";
+        String apiUrl = "https://gnews.io/api/v4/search?q=" + subcategory + "&apikey=b30033fd80f44a50cec737303c807bd8&lang=en";
         ResponseEntity<NewsApiResponse> response = restTemplate.getForEntity(apiUrl, NewsApiResponse.class);
 
         NewsApiResponse newsApiResponse = response.getBody();
