@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +11,7 @@
 <body>
     <div class="container light-style flex-grow-1 container-p-y">
         <h4 class="font-weight-bold py-3 mb-4">
-            Account settings
+            Account Settings
         </h4>
         <div class="card overflow-hidden">
             <div class="row no-gutters row-bordered row-border-light">
@@ -21,74 +20,83 @@
                         <a class="list-group-item list-group-item-action active" data-toggle="list"
                             href="#account-general">General</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list"
-                            href="#account-change-password">Change password</a>
+                            href="#account-change-password">Change Password</a>
                         <a class="list-group-item list-group-item-action" data-toggle="list"
                             href="#account-preferences">Preferences</a>
                     </div>
                 </div>
                 <div class="col-md-9">
                     <div class="tab-content">
-                        <div class="tab-pane fade active show" id="account-general">
+                        <!-- General Information Tab -->
+                        <div id="account-general" class="tab-pane fade active show">
                             <hr class="border-light m-0">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label class="form-label">Username</label>
-                                    <input type="text" class="form-control mb-1" value="LoggedUsername" readonly>
+                                    <input type="text" class="form-control mb-1" name="username" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Firstname</label>
-                                    <input type="text" class="form-control" value="First Name">
+                                    <input type="text" class="form-control" name="firstname">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Lastname</label>
-                                    <input type="text" class="form-control" value="Last Name">
+                                    <input type="text" class="form-control" name="lastname">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">E-mail</label>
-                                    <input type="text" class="form-control mb-1" value="LoggedEmail" readonly>
+                                    <label class="form-label">Email</label>
+                                    <input type="text" class="form-control mb-1" name="email" readonly>
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="account-change-password">
-                            <div class="card-body pb-2">
+                        
+                        <!-- Change Password Tab -->
+                        <div id="account-change-password" class="tab-pane fade">
+                            <h2>Change Password</h2>
+                            <hr class="border-light m-0">
+                            <div class="card-body">
                                 <div class="form-group">
-                                    <label class="form-label">Current password</label>
-                                    <input type="password" class="form-control">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" name="currentPassword" id="currentPassword">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">New password</label>
-                                    <input type="password" class="form-control">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" name="newPassword" id="newPassword">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Repeat new password</label>
-                                    <input type="password" class="form-control">
+                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" name="confirmPassword" id="confirmPassword">
                                 </div>
+                                <button id="update-password-btn" class="btn btn-primary">Update Password</button>
                             </div>
                         </div>
+
+                        <!-- Preferences Tab -->
                         <div class="tab-pane fade" id="account-preferences">
                             <div class="card-body">
                                 <h5 class="mb-4">Your Selected Preferences</h5>
-                                <!-- User preferences will be dynamically added here via JavaScript -->
+                                <div id="preferencesContainer">
+                                    <!-- User preferences will be dynamically added here via JavaScript -->
+                                </div>
+                                <button id="add-more-btn" class="btn btn-primary mt-3">Add More Preferences</button>
                             </div>
-                            <button id="add-more-btn" class="btn btn-primary mt-3">Add More</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Save Changes Button -->
         <div class="text-right mt-3">
-            <button type="button" class="btn btn-primary">Save changes</button>&nbsp;
+            <button type="button" id="save-changes-btn" class="btn btn-primary">Save Changes</button>&nbsp;
             <button type="button" class="btn btn-default">Cancel</button>
         </div>
     </div>
 
+    <!-- JavaScript Files -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="profile.js">
-    //     function redirectToAddMore() {
-    //         window.location.href = "add_more_preferences.html";
-    //     }
-    // </script>
+    <script src="profile.js"></script>
 </body>
 
 </html>
