@@ -162,3 +162,21 @@ header h1, .heading-container h4 {
 #login-footer a:hover {
   text-decoration: underline;
 }
+
+.profile-icon-container {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.profile-icon:hover {
+    transform: scale(1.1);
+}
