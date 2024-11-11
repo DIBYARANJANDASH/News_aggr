@@ -19,17 +19,25 @@ function displayError(elementId, message) {
   errorMessageDiv.style.display = "block";
 }
 
-// Login Function
+// Add event listener to the login form submission
 document.getElementById("loginForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+  e.preventDefault();  // Prevent default form submission behavior
 
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
+  // Encrypt the password using the encryptPassword function
+  const encryptedPassword = encryptPassword(password);
+  console.log(encryptedPassword);
+
+  // Send the username and encrypted password to the backend
   fetch(`${apiUrl}/users/loginUser`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({
+      username,
+      password: encryptedPassword  // Use the encrypted password here
+    })
   })
     .then((response) => {
       if (!response.ok) {
@@ -38,6 +46,7 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
       return response.json();
     })
     .then((data) => {
+      // Store user ID in local storage and redirect to news feed
       localStorage.setItem("userId", data.userId);
       window.location.href = "newsFeed.html";
     })
@@ -46,6 +55,7 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
       displayError("error-message", error.message);
     });
 });
+
 
 // Signup Function
 document.getElementById("signupForm").addEventListener("submit", (e) => {
@@ -94,24 +104,34 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
     });
 });
 
-// Password Encryption Function
-//const encryptPassword = (plainText) => {
-//  const secretKey = "123"; // Ensure this matches the backend
-// console.log( typeof(secretKey))
-//  const salt = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes salt
-//  const key = CryptoJS.PBKDF2(secretKey, salt, { keySize: 256 / 32, iterations: 1000 });
-//  const iv = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes IV
-//  console.log("Secret Key:", secretKey);
-//  console.log("Salt (Base64):", CryptoJS.enc.Base64.stringify(salt));
-//  console.log("Key (Hex):", key.toString(CryptoJS.enc.Hex));
-//  console.log("IV (Base64):", CryptoJS.enc.Base64.stringify(iv));
-//
-//  // Encrypt with AES-CBC using generated key and IV
-//  const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv, padding: CryptoJS.pad.Pkcs7 });
-//
-//  // Format the output: salt:iv:ciphertext
-//  const cipherText = CryptoJS.enc.Base64.stringify(salt) + ":" +
-//                     CryptoJS.enc.Base64.stringify(iv) + ":" +
-//                     encrypted.toString();
-//  return cipherText;
-//};
+
+const encryptPassword = (plainText) => {
+  const secretKey = "123"; // Ensure this matches the backend
+
+  // Generate 16-byte salt and IV in hex format
+  const salt = CryptoJS.lib.WordArray.random(128 / 8); // 16 bytes
+  const iv = CryptoJS.lib.WordArray.random(128 / 8);   // 16 bytes
+
+  // Derive the key using PBKDF2
+  const key = CryptoJS.PBKDF2(secretKey, salt, {
+    keySize: 256 / 32,  // 256-bit key
+    iterations: 1000,
+    hasher: CryptoJS.algo.SHA256, // Explicitly use SHA256
+  });
+
+  // Encrypt the plainText with AES using CBC mode and PKCS7 padding
+  const encrypted = CryptoJS.AES.encrypt(plainText, key, {
+    iv: iv,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  // Format the output as: hex(salt):hex(iv):ciphertext (ciphertext remains in Base64)
+  const cipherText = [
+    salt.toString(CryptoJS.enc.Hex),   // Convert salt to hex
+    iv.toString(CryptoJS.enc.Hex),     // Convert iv to hex
+    encrypted.toString()               // ciphertext in Base64
+  ].join(":");
+
+  return cipherText;
+};
+
