@@ -5,8 +5,8 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.dto.SignupRequest;
+import com.newsagg_nlp.news_agg.dto.UserInfoUpdate;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
-//import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,9 +37,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
-
-//import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
-
 
 @Service
 public class UserService {
@@ -107,6 +104,24 @@ public class UserService {
         userRepo.deleteById(userId);
     }
 
+    public void updateUserInfo(String userId, UserInfoUpdate userInfoUpdate) {
+        Optional<UserEntity> userOptional = userRepo.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        UserEntity user = userOptional.get();
+
+        if (userInfoUpdate.getFirstname() != null) {
+            user.setFirstname(userInfoUpdate.getFirstname());
+        }
+        if (userInfoUpdate.getLastname() != null) {
+            user.setLastname(userInfoUpdate.getLastname());
+        }
+        userRepo.save(user);
+
+    }
 
 
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws Exception {

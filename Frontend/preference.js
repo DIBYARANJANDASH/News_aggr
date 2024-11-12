@@ -42,7 +42,7 @@ function savePreferences() {
     const subcategoryDropdown = document.getElementById("subcategory");
     const selectedPreferences = [{
         subcategoryId: subcategoryDropdown.value,
-        priority: 1 // You can set priority based on your requirements
+        priority: 1
     }];
 
     fetch(`${apiUrl}/preferences/${userId}`, {
