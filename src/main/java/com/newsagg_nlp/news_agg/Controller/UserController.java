@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 //@CrossOrigin(origins = "http://127.0.0.1:5500/loginpage/login.html?")
-@CrossOrigin(origins = "http://localhost:63342")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -36,7 +36,7 @@ public class UserController {
         return userService.authenticateUser(loginRequest);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/details/{id}")
     public Optional<UserEntity> getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }

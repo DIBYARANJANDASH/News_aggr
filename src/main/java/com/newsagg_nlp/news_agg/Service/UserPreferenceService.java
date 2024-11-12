@@ -6,12 +6,14 @@ import com.newsagg_nlp.news_agg.Entity.UserPreferencesEntity;
 import com.newsagg_nlp.news_agg.Repo.SubCategoryRepo;
 import com.newsagg_nlp.news_agg.Repo.UserPreferenceRepo;
 import com.newsagg_nlp.news_agg.Repo.UserRepo;
+import com.newsagg_nlp.news_agg.dto.UserPreferenceDTO;
 import com.newsagg_nlp.news_agg.dto.UserPreferenceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserPreferenceService {
@@ -43,5 +45,21 @@ public class UserPreferenceService {
 
             userPreferenceRepo.save(preference);
         }
+    }
+
+    public List<UserPreferenceDTO> getUserPreferences(String userId) {
+        List<UserPreferencesEntity> preferences = userPreferenceRepo.findByUser_userId(userId);
+
+        return preferences.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private UserPreferenceDTO convertToDTO(UserPreferencesEntity preference) {
+        UserPreferenceDTO dto = new UserPreferenceDTO();
+        dto.setCategoryName(preference.getSubCategory().getCategory().getCategoryName());  // Ensure correct getter chain
+        dto.setSubCategoryName(preference.getSubCategory().getSubcategoryName());
+        dto.setPriority(preference.getPriority());
+        return dto;
     }
 }
