@@ -1,11 +1,11 @@
 const apiUrl = "http://localhost:8080/api";
 
 document.addEventListener('DOMContentLoaded', () => {
-    const userId = localStorage.getItem("userId");  // Retrieve user ID from localStorage
-    const token = localStorage.getItem("token");  // Retrieve JWT token
+    const userId = localStorage.getItem("userId");  // Retrieve user ID from localStorage or session storage
+    const token = localStorage.getItem("token");  // Retrieve JWT token for authorization
 
-    console.log("Token:", token);
-    console.log("User ID:", userId);
+    console.log(token);
+    console.log(userId);
 
     if (!userId || !token) {
         alert("User is not logged in");
@@ -13,24 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Fetch and display user details and preferences
+    // Fetch and display user details
     fetchUserDetails(userId, token);
+    fetchAndDisplayPreferences(userId, token);
 
-    // Event listener for saving user info (firstname, lastname)
-    document.getElementById('save-changes-btn').addEventListener('click', () => {
-        updateUserInfo(userId, token);
-    });
-
+    document.getElementById('save-general-info-btn').addEventListener('click', () => {
+            updateUserInfo(userId, token);
+        });
     // Update password form submission
-    document.getElementById('update-password-btn').addEventListener('click', updatePassword);
+    document.getElementById('update-password-btn').addEventListener('click', () => updatePassword(userId, token));
 
     // Redirect to add more preferences
     document.getElementById('add-more-btn').addEventListener('click', () => {
-        window.location.href = '/preferences.html';
+        window.location.href = './preferences.html';
     });
 });
 
-// Function to fetch user details
+/// Function to fetch user details
 function fetchUserDetails(userId, token) {
     fetch(`${apiUrl}/users/${userId}`, {
         method: 'GET',
@@ -44,48 +43,25 @@ function fetchUserDetails(userId, token) {
         return response.json();
     })
     .then(data => {
-        // Set read-only fields
+        // Populate user detail fields
         document.querySelector('#account-general input[name="username"]').value = data.username;
+        document.querySelector('#account-general input[name="firstname"]').value = data.firstname;
+        document.querySelector('#account-general input[name="lastname"]').value = data.lastname;
         document.querySelector('#account-general input[name="email"]').value = data.email;
 
-        // Set editable fields
-        document.querySelector('#account-general input[name="firstname"]').value = data.firstname || "";
-        document.querySelector('#account-general input[name="lastname"]').value = data.lastname || "";
-
-        // Display preferences
-        displayPreferences(data.preferences || []);  // Displaying preferences if available
+        // Display user preferences
+        displayPreferences(data.preferences);
     })
     .catch(error => console.error('Error fetching user details:', error));
 }
-
-// Function to display user preferences
-function displayPreferences(preferences) {
-    const preferencesContainer = document.getElementById('preferencesContainer');
-    preferencesContainer.innerHTML = '';  // Clear existing preferences
-
-    // Check if preferences is an array and has at least one item
-    if (!Array.isArray(preferences) || preferences.length === 0) {
-        preferencesContainer.innerHTML = "<p>No preferences set yet.</p>";
-        return;
-    }
-
-    preferences.forEach(pref => {
-        const prefItem = document.createElement('div');
-        prefItem.classList.add('alert', 'alert-info', 'mt-2');
-        prefItem.innerText = `${pref.category} - ${pref.subCategory} (Priority: ${pref.priority})`;
-        preferencesContainer.appendChild(prefItem);
-    });
-}
-
-
-// Function to update firstname and lastname
+// Update user's first name and last name
 function updateUserInfo(userId, token) {
-    const firstname = document.querySelector('#account-general input[name="firstname"]').value;
-    const lastname = document.querySelector('#account-general input[name="lastname"]').value;
+    const updatedFirstname = document.querySelector('input[name="firstname"]').value;
+    const updatedLastname = document.querySelector('input[name="lastname"]').value;
 
-    const updateRequest = {
-        firstname: firstname,
-        lastname: lastname
+    const requestBody = {
+        firstname: updatedFirstname,
+        lastname: updatedLastname
     };
 
     fetch(`${apiUrl}/users/update-info/${userId}`, {
@@ -94,17 +70,56 @@ function updateUserInfo(userId, token) {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updateRequest)
+        body: JSON.stringify(requestBody)
     })
     .then(response => {
         if (!response.ok) throw new Error('Failed to update user info');
-        alert('User info updated successfully.');
+        alert('User info updated successfully');
+        fetchUserDetails(userId, token); // Refresh user info without reloading the page
     })
     .catch(error => console.error('Error updating user info:', error));
 }
 
+// Function to fetch and display user preferences separately (if needed)
+function fetchAndDisplayPreferences(userId, token) {
+    fetch(`${apiUrl}/preferences/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch preferences');
+        return response.json();
+    })
+    .then(data => {
+        displayPreferences(data);  // Pass the data to displayPreferences
+    })
+    .catch(error => console.error('Error fetching preferences:', error));
+}
+
+// Function to display user preferences
+function displayPreferences(preferences) {
+    const preferencesContainer = document.getElementById('preferencesContainer');
+    preferencesContainer.innerHTML = '';  // Clear existing preferences
+
+    if(preferences!==undefined){
+
+            preferences.forEach(pref => {
+                const prefItem = document.createElement('div');
+                prefItem.classList.add('preference-item');
+                // Display category and subcategory names (ensure these match your DTO field names)
+                prefItem.innerText = `${pref.categoryName} - ${pref.subCategoryName}`;
+                preferencesContainer.appendChild(prefItem);
+            });
+
+    }
+}
+
+
 // Function to update password
-function updatePassword() {
+function updatePassword(userId, token) {
     const currentPassword = document.querySelector('#account-change-password input[name="currentPassword"]').value;
     const newPassword = document.querySelector('#account-change-password input[name="newPassword"]').value;
     const confirmPassword = document.querySelector('#account-change-password input[name="confirmPassword"]').value;
@@ -119,20 +134,21 @@ function updatePassword() {
         newPassword: newPassword
     };
 
-    fetch(`${apiUrl}/users/${userId}`, {
+    fetch(`${apiUrl}/users/change-password/${userId}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody)  // Ensure the body is stringified
     })
     .then(response => {
         if (response.ok) {
             alert('Password updated successfully');
         } else {
-            throw new Error('Failed to update password');
+            response.text().then(text => alert(text));
         }
     })
     .catch(error => console.error('Error updating password:', error));
 }
+

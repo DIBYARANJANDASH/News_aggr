@@ -1,5 +1,6 @@
 package com.newsagg_nlp.news_agg.Controller;
 
+import com.newsagg_nlp.news_agg.dto.UserPreferenceDTO;
 import com.newsagg_nlp.news_agg.dto.UserPreferenceRequest;
 import com.newsagg_nlp.news_agg.Service.UserPreferenceService;
 import com.newsagg_nlp.news_agg.dto.UserPreferenceRequest;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/preferences")
-@CrossOrigin(origins = "http://localhost:63342")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserPreferenceController {
     private final UserPreferenceService userPreferenceService;
 
@@ -34,4 +35,11 @@ public class UserPreferenceController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    // Endpoint to retrieve preferences for a specific user
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<UserPreferenceDTO>> getUserPreferences(@PathVariable String userId) {
+        List<UserPreferenceDTO> preferences = userPreferenceService.getUserPreferences(userId);
+        return new ResponseEntity<>(preferences, HttpStatus.OK);
+    }
+
 }
