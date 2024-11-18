@@ -6,7 +6,6 @@ import com.newsagg_nlp.news_agg.Entity.UserPreferencesEntity;
 import com.newsagg_nlp.news_agg.Repo.ArticleRepo;
 import com.newsagg_nlp.news_agg.Repo.SubCategoryRepo;
 import com.newsagg_nlp.news_agg.Repo.UserPreferenceRepo;
-import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,11 +24,11 @@ public class ArticleService {
     private final UserPreferenceRepo userPreferenceRepo;
     private final RestTemplate restTemplate;
 
-    private static final Duration EXPIRY_DURATION = Duration.ofDays(1); // Expiry duration for articles
+    private static final Duration EXPIRY_DURATION = Duration.ofDays(2); // Expiry duration for articles
 
     @Autowired
     public ArticleService(ArticleRepo articleRepo, SubCategoryRepo subCategoryRepo, RestTemplate restTemplate,
-                          UserPreferenceRepo userPreferenceRepo, UserRepo userRepo) {
+                          UserPreferenceRepo userPreferenceRepo) {
         this.articleRepo = articleRepo;
         this.subCategoryRepo = subCategoryRepo;
         this.restTemplate = restTemplate;
@@ -40,7 +38,7 @@ public class ArticleService {
     /**
      * Fetch articles from an API and store them in the database if they are outdated.
      *
-     * @param category The category parameter for the API.
+     * @param category    The category parameter for the API.
      * @param subcategory The subcategory parameter for the API.
      * @return List of saved ArticleEntity objects.
      */
@@ -71,15 +69,20 @@ public class ArticleService {
 
         NewsApiResponse newsApiResponse = response.getBody();
         if (newsApiResponse != null && newsApiResponse.getArticles() != null) {
-            List<ArticleEntity> articles = newsApiResponse.getArticles();
+            List<ArticleEntity> newArticles = newsApiResponse.getArticles();
 
             // Set subcategoryId for each article
-            articles.forEach(article -> article.setSubcategoryId(subcategoryId));
+            newArticles.forEach(article -> article.setSubcategoryId(subcategoryId));
 
-            // Delete old articles and save new ones
-            articleRepo.deleteAll(articleRepo.findBySubcategoryId(subcategoryId));
-            articleRepo.saveAll(articles);
-            return articles;
+            // Filter only new articles to avoid duplication
+            List<ArticleEntity> existingArticles = articleRepo.findBySubcategoryId(subcategoryId);
+            List<ArticleEntity> articlesToSave = newArticles.stream()
+                    .filter(newArticle -> existingArticles.stream()
+                            .noneMatch(existing -> existing.getTitle().equals(newArticle.getTitle())))
+                    .collect(Collectors.toList());
+
+            articleRepo.saveAll(articlesToSave); // Save only non-duplicate articles
+            return articleRepo.findBySubcategoryId(subcategoryId); // Return all articles
         }
         return List.of();
     }
@@ -91,7 +94,7 @@ public class ArticleService {
      * @return List of articles based on user preferences.
      */
     public List<ArticleEntity> getArticlesByUserPreferences(String userId) {
-        // Fetch user preferences based on subcategoryId
+        // Fetch unique user preferences based on subcategoryId
         List<UserPreferencesEntity> userPreferences = userPreferenceRepo.findByUser_userId(userId);
 
         if (userPreferences.isEmpty()) {
@@ -99,23 +102,27 @@ public class ArticleService {
             return List.of(); // Return empty list if no preferences
         }
 
-        // Extract subcategory IDs from preferences
-        List<String> subCategoryIds = userPreferences.stream()
+        // Extract unique subcategory IDs from preferences
+        Set<String> uniqueSubCategoryIds = userPreferences.stream()
                 .map(preference -> preference.getSubCategory().getSubcategoryId())
-                .collect(Collectors.toList());
-
-        System.out.println("Subcategories for user " + userId + ": " + subCategoryIds);
+                .collect(Collectors.toSet());
 
         // Fetch articles for each preferred subcategory, dynamically getting the category name
-        return subCategoryIds.stream()
+        return uniqueSubCategoryIds.stream()
                 .flatMap(subcategoryId -> {
-                    // Retrieve the category name for each subcategory
-                    SubCategoryEntity subCategory = subCategoryRepo.findById(subcategoryId)
-                            .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
+                    try {
+                        // Retrieve the category name for each subcategory
+                        SubCategoryEntity subCategory = subCategoryRepo.findById(subcategoryId)
+                                .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
 
-                    String categoryName = subCategory.getCategory().getCategoryName();  // Assuming `getCategory()` and `getCategoryName()` are defined
-                    return fetchArticlesFromApi(categoryName, subCategory.getSubcategoryName()).stream();
+                        String categoryName = subCategory.getCategory().getCategoryName();
+                        return fetchArticlesFromApi(categoryName, subCategory.getSubcategoryName()).stream();
+                    } catch (Exception e) {
+                        System.err.println("Failed to fetch articles for subcategory: " + subcategoryId);
+                        return null;
+                    }
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

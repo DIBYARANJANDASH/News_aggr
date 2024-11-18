@@ -5,13 +5,14 @@ import com.newsagg_nlp.news_agg.Repo.UserRepo;
 import com.newsagg_nlp.news_agg.dto.LoginRequest;
 import com.newsagg_nlp.news_agg.dto.LoginResponse;
 import com.newsagg_nlp.news_agg.dto.SignupRequest;
+import com.newsagg_nlp.news_agg.dto.UserInfoUpdate;
 import com.newsagg_nlp.news_agg.jwt.JwtUtils;
-//import com.newsagg_nlp.news_agg.utils.Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,9 +38,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
-
-//import static com.newsagg_nlp.news_agg.utils.Crypt.decrypt;
-
 
 @Service
 public class UserService {
@@ -106,6 +104,31 @@ public class UserService {
         userRepo.deleteById(userId);
     }
 
+//    public void updateUserInfo(String userId, UserInfoUpdate userInfoUpdate) {
+//        Optional<UserEntity> userOptional = userRepo.findById(userId);
+//
+//        if (userOptional.isEmpty()) {
+//            throw new RuntimeException("User not found");
+//        }
+//
+//        UserEntity user = userOptional.get();
+//
+//        if (userInfoUpdate.getFirstname() != null) {
+//            user.setFirstname(userInfoUpdate.getFirstname());
+//        }
+//        if (userInfoUpdate.getLastname() != null) {
+//            user.setLastname(userInfoUpdate.getLastname());
+//        }
+//        userRepo.save(user);
+//
+//    }
+    public void updateUserInfo(String userId, String newFirstname, String newLastname) {
+        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFirstname(newFirstname);
+        user.setLastname(newLastname);
+        user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));  // Optional: update the timestamp
+        userRepo.save(user);
+}
 
 
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws Exception {
@@ -144,6 +167,27 @@ public class UserService {
 
         return ResponseEntity.ok(response);
     }
+
+
+
+    public boolean updateUserPassword(String userId, String currentPassword, String newPassword) {
+        // Fetch user by ID from the database
+        UserEntity user = userRepo.findById(userId).orElse(null);
+        if (user == null) {
+            return false;  // User not found
+        }
+
+        // Check if the current password matches
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;  // Passwords do not match
+        }
+
+        // Update with new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+        return true;
+    }
+
 }
 
 

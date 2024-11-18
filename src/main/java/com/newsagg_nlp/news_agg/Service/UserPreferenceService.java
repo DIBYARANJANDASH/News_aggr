@@ -36,14 +36,17 @@ public class UserPreferenceService {
             SubCategoryEntity subCategory = subCategoryRepo.findById(preferenceRequest.getSubcategoryId())
                     .orElseThrow(() -> new RuntimeException("Subcategory not found"));
 
-            UserPreferencesEntity preference = new UserPreferencesEntity();
-            preference.setUser(user);
-            preference.setSubCategory(subCategory);
-            preference.setPriority(preferenceRequest.getPriority());
-            preference.setCreatedAt(LocalDateTime.now());
-            preference.setUpdatedAt(LocalDateTime.now());
+            boolean exists = userPreferenceRepo.existsByUserAndSubCategory(user, subCategory);
+            if (!exists) {
+                UserPreferencesEntity preference = new UserPreferencesEntity();
+                preference.setUser(user);
+                preference.setSubCategory(subCategory);
+                preference.setPriority(preferenceRequest.getPriority());
+                preference.setCreatedAt(LocalDateTime.now());
+                preference.setUpdatedAt(LocalDateTime.now());
 
-            userPreferenceRepo.save(preference);
+                userPreferenceRepo.save(preference);
+            }
         }
     }
 

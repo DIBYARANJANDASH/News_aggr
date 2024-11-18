@@ -35,11 +35,11 @@ public class UserPreferenceController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
     // Endpoint to retrieve preferences for a specific user
     @GetMapping("/{userId}")
     public ResponseEntity<List<UserPreferenceDTO>> getUserPreferences(@PathVariable String userId) {
         List<UserPreferenceDTO> preferences = userPreferenceService.getUserPreferences(userId);
         return new ResponseEntity<>(preferences, HttpStatus.OK);
     }
+
 }
