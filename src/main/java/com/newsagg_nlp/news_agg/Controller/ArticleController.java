@@ -38,6 +38,7 @@ public class ArticleController {
     @GetMapping("/preferences/{userId}")
     public ResponseEntity<List<ArticleEntity>> getArticlesByUserPreferences(@PathVariable String userId) {
         List<ArticleEntity> articles = articleService.getArticlesByUserPreferences(userId);
+
         if (articles.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(articles);
         }
