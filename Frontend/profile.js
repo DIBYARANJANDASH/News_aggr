@@ -140,7 +140,7 @@ function updatePassword(userId, token) {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)  // Ensure the body is stringified
+        body: JSON.stringify(requestBody)
     })
     .then(response => {
         if (response.ok) {
@@ -151,6 +151,7 @@ function updatePassword(userId, token) {
     })
     .catch(error => console.error('Error updating password:', error));
 }
+
 function redirectToNewsFeed() {
     window.location.href = "newsFeed.html";
 }
