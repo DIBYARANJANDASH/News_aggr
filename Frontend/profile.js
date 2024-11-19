@@ -99,23 +99,59 @@ function fetchAndDisplayPreferences(userId, token) {
     .catch(error => console.error('Error fetching preferences:', error));
 }
 
-// Function to display user preferences
+// Function to display user preferences with draggable feature
 function displayPreferences(preferences) {
-    const preferencesContainer = document.getElementById('preferencesContainer');
-    preferencesContainer.innerHTML = '';  // Clear existing preferences
+    const preferencesContainer = document.getElementById('preferences-lsit');
+    preferencesContainer.innerHTML = ''; // Clear existing preferences
 
-    if(preferences!==undefined){
+    if (preferences !== undefined) {
+        preferences.forEach(pref => {
+            const prefItem = document.createElement('li');
+            prefItem.classList.add('preference-item');
+            prefItem.draggable = true; // Make the item draggable
 
-            preferences.forEach(pref => {
-                const prefItem = document.createElement('div');
-                prefItem.classList.add('preference-item');
-                // Display category and subcategory names (ensure these match your DTO field names)
-                prefItem.innerText = `${pref.categoryName} - ${pref.subCategoryName}`;
-                preferencesContainer.appendChild(prefItem);
-            });
+            // Display category and subcategory names (ensure these match your DTO field names)
+            prefItem.innerText = `${pref.categoryName} - ${pref.subCategoryName}`;
 
+            // Add drag and drop event listeners
+            prefItem.addEventListener('dragstart', handleDragStart);
+            prefItem.addEventListener('dragover', handleDragOver);
+            prefItem.addEventListener('drop', handleDrop);
+            prefItem.addEventListener('dragleave', handleDragLeave);
+
+            preferencesContainer.appendChild(prefItem);
+        });
     }
 }
+
+// Drag and Drop Handlers
+let draggedItem = null;
+
+function handleDragStart(e) {
+    draggedItem = e.target; // Set the dragged item
+    e.target.style.opacity = '0.5'; // Visual feedback
+    e.dataTransfer.effectAllowed = 'move'; // Indicate the type of operation
+}
+
+function handleDragOver(e) {
+    e.preventDefault(); // Allow the drop
+    e.target.classList.add('over'); // Add a visual highlight to the drop target
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.target.classList.remove('over'); // Remove the visual highlight
+
+    if (draggedItem !== e.target) {
+        const parent = e.target.parentNode;
+        parent.insertBefore(draggedItem, e.target); // Move the dragged item to its new position
+    }
+}
+
+function handleDragLeave(e) {
+    e.target.classList.remove('over'); // Remove the visual highlight when leaving a drop target
+}
+
 
 
 // Function to update password
