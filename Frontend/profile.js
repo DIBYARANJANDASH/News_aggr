@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /// Function to fetch user details
 function fetchUserDetails(userId, token) {
-    fetch(`${apiUrl}/users/${userId}`, {
+    fetch(`${apiUrl}/users/details/${userId}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -151,4 +151,9 @@ function updatePassword(userId, token) {
     })
     .catch(error => console.error('Error updating password:', error));
 }
+function redirectToNewsFeed() {
+    window.location.href = "newsFeed.html";
+}
+
+
 

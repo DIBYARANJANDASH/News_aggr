@@ -1,22 +1,28 @@
 package com.newsagg_nlp.news_agg.Entity;
+
+import com.newsagg_nlp.news_agg.Entity.UserEntity;
+import com.newsagg_nlp.news_agg.Entity.UserSearchHistoryEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "user_favourites")
 public class UserFavouritesEntity {
     @Id
     @Column(name = "favourite_id", columnDefinition = "CHAR(36)")
-    private String favouriteId;
+    private String favouriteId = UUID.randomUUID().toString();
 
     @ManyToOne
-    @JoinColumn(name = "user_id", columnDefinition = "CHAR(36)")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "article_id")
-    private String articleId;
+    @OneToOne
+    @JoinColumn(name = "search_id", referencedColumnName = "search_id", nullable = false)
+    private UserSearchHistoryEntity searchHistory;
 
-    private LocalDateTime favouritedAt;
+    @Column(nullable = false)
+    private boolean feedback;
 }

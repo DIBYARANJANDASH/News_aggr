@@ -40,7 +40,7 @@ public class UserController {
         return userService.authenticateUser(loginRequest);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/details/{id}")
     public Optional<UserEntity> getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }

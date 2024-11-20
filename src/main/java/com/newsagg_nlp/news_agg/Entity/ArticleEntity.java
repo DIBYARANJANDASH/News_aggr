@@ -1,5 +1,6 @@
 package com.newsagg_nlp.news_agg.Entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +17,7 @@ public class ArticleEntity {
     private String description;
     private String content;
     private URL url;
+    @JsonProperty("image")
     private URL imageUrl;
 
     private Source source;
