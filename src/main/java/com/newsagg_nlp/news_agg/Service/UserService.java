@@ -69,7 +69,6 @@ public class UserService {
         newUser.setFirstname(signupRequest.getFirstname());
         newUser.setLastname(signupRequest.getLastname());
         newUser.setUsername(signupRequest.getUsername());
-//        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setPassword(passwordEncoder.encode(decryptedPassword));
         newUser.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         newUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));

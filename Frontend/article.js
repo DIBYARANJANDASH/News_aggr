@@ -136,3 +136,47 @@ function saveFeedback(searchId, feedback) {
 
 // Call fetchArticles on page load
 document.addEventListener("DOMContentLoaded", fetchArticles);
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const logoutButton = document.getElementById("log-btn"); // Ensure the logout button has the correct ID
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            logout(); // Call the logout function
+        });
+    }
+});
+
+function logout() {
+    const token = localStorage.getItem("token");
+
+    // Call backend logout API
+    fetch(`${apiUrl}/logout`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Logout successful");
+        } else {
+            console.error("Logout failed");
+        }
+    })
+    .catch(error => console.error("Logout API Error:", error))
+    .finally(() => {
+        // Clear session and redirect
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        redirectToHome();
+    });
+}
+
+// Redirect to home page
+function redirectToHome() {
+    alert("Session expired or logged out. Redirecting to home page.");
+    window.location.href = "home.html";
+}
+

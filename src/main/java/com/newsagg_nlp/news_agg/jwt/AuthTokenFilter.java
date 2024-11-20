@@ -1,5 +1,6 @@
 package com.newsagg_nlp.news_agg.jwt;
 
+import com.newsagg_nlp.news_agg.Controller.AuthController;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,22 +31,25 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        logger.debug("AuthTokenFilter called for URI: {}", request.getRequestURI());
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                // Check if the token is blacklisted
+                if (AuthController.isTokenBlacklisted(jwt)) {
+                    logger.warn("Token is blacklisted: {}", jwt);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Token is blacklisted. Please log in again.");
+                    return;
+                }
+
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                logger.debug("Roles from JWT: {}", userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
@@ -55,9 +59,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+
     private String parseJwt(HttpServletRequest request) {
         String jwt = jwtUtils.getJwtFromHeader(request);
         logger.debug("AuthTokenFilter.java: {}", jwt);
         return jwt;
     }
+
+
 }

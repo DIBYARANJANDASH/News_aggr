@@ -112,3 +112,18 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
     padding     : 0.85rem 1.5rem;
     border-color: rgba(24, 28, 33, 0.03) !important;
 }
+
+.preference-item {
+    list-style: none;
+    padding: 10px;
+    margin: 5px;
+    background: #a2f0fa;
+    border: 1px solid #1ce669;
+    cursor: move;
+    align-items: center;
+}
+
+.preference-item.over {
+    border: 2px dashed #7de9a6;
+    background: #f0f0ff;
+}

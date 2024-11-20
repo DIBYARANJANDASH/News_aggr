@@ -30,13 +30,20 @@ header h1, .heading-container h4 {
   font-size: 30px;
 }
 
-/* Auth buttons */
-.auth-buttons {
+.profile-icon-container {
   display: flex;
   gap: 10px;
 }
 
-.auth-buttons button {
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.logout-btn {
   padding: 8px 16px;
   font-size: 14px;
   color: #fff;
@@ -47,7 +54,8 @@ header h1, .heading-container h4 {
   transition: background-color 0.3s ease;
 }
 
-.auth-buttons .login-btn:hover {
+.profile-icon:hover ,.logout-btn:hover {
+  transform: scale(1.1);
   background-color: #a2f0fa;
 }
 
@@ -161,22 +169,4 @@ header h1, .heading-container h4 {
 
 #login-footer a:hover {
   text-decoration: underline;
-}
-
-.profile-icon-container {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-}
-
-.profile-icon {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-}
-
-.profile-icon:hover {
-    transform: scale(1.1);
 }

@@ -46,7 +46,12 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
       return response.json();
     })
     .then((data) => {
+      console.log(data)
       // Store user ID in local storage and redirect to news feed
+      localStorage.setItem("token", data.jwtToken); // Save token
+      localStorage.setItem("userId", data.userId); // Save userId
+      console.log("Token stored:", data.jwtToken);
+
       localStorage.setItem("userId", data.userId);
       window.location.href = "newsFeed.html";
     })
