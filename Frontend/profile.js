@@ -187,6 +187,11 @@ function updatePassword(userId, token) {
     })
     .catch(error => console.error('Error updating password:', error));
 }
+function redirectToNewsFeed() {
+    window.location.href = "newsFeed.html";
+}
+
+
 
 function redirectToNewsFeed() {
     window.location.href = "newsFeed.html";

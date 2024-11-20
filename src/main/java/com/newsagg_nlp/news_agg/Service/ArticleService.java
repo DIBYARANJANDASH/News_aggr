@@ -83,6 +83,7 @@ public class ArticleService {
 
             articleRepo.saveAll(articlesToSave); // Save only non-duplicate articles
             return articleRepo.findBySubcategoryId(subcategoryId); // Return all articles
+
         }
         return List.of();
     }
