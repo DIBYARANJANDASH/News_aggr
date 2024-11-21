@@ -32,18 +32,12 @@ header h1, .heading-container h4 {
 
 .profile-icon-container {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 10px; /* Adds spacing between buttons and icons */
 }
 
-.profile-icon {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-}
-
-.logout-btn {
+/* Unified Button Styling */
+.nav-btn, .logout-btn {
   padding: 8px 16px;
   font-size: 14px;
   color: #fff;
@@ -51,30 +45,24 @@ header h1, .heading-container h4 {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.profile-icon:hover ,.logout-btn:hover {
+.nav-btn:hover, .logout-btn:hover {
+  background-color: #0056b3;
   transform: scale(1.1);
-  background-color: #a2f0fa;
 }
 
-/* Options container */
-.options-container {
-  margin-top: 80px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5em;
-  text-align: center;
-}
-
-.option {
-  background-color: #d5d5d5;
+.profile-icon {
+  width: 40px;
+  height: 40px;
   cursor: pointer;
-  padding: 0.8em 1.5em;
-  border-radius: 0.5em;
-  text-transform: capitalize;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.profile-icon:hover {
+  transform: scale(1.1);
 }
 
 /* Main container */
@@ -136,12 +124,6 @@ header h1, .heading-container h4 {
   background-color: #a21820;
 }
 
-/* Active state styling */
-.active {
-  background-color: #cb202d;
-  color: #ffffff;
-}
-
 /* Responsive styles */
 @media only screen and (max-width: 768px) {
   .container, .news-container {
@@ -169,4 +151,39 @@ header h1, .heading-container h4 {
 
 #login-footer a:hover {
   text-decoration: underline;
+}
+/* Feedback Buttons */
+.feedback-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.feedback-buttons button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.feedback-buttons .like-btn {
+  background-color: #28a745; /* Green */
+  color: #fff;
+}
+
+.feedback-buttons .like-btn:hover {
+  background-color: #218838; /* Darker green */
+  transform: scale(1.1);
+}
+
+.feedback-buttons .dislike-btn {
+  background-color: #dc3545; /* Red */
+  color: #fff;
+}
+
+.feedback-buttons .dislike-btn:hover {
+  background-color: #c82333; /* Darker red */
+  transform: scale(1.1);
 }
