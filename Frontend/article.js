@@ -53,9 +53,12 @@ function displayArticles(articles) {
                 const articleCard = document.createElement("div");
                 articleCard.classList.add("news-card");
 
+                const imageUrl = article.image || "https://via.placeholder.com/150?text=No+Image";
+
+
                 articleCard.innerHTML = `
                     <div class="news-image-container">
-                        <img src="${article.image}" alt = "News Image" />
+                        <img src="${imageUrl}" alt = "News Image" />
                     </div>
                     <div class="news-content">
                         <div class="news-title">
