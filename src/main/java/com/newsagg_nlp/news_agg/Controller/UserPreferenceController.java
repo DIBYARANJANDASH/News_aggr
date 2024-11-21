@@ -25,21 +25,36 @@ public class UserPreferenceController {
     }
 
     // Updated endpoint to receive subcategoryId and priority
-    @PostMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> saveUserPreferences(@PathVariable String userId, @RequestBody List<UserPreferenceRequest> preferences) {        userPreferenceService.saveUserPreferences(userId, preferences);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "User Preferences saved successfully");
-        response.put("userId", userId);
-        response.put("savedPreferences", preferences);  // Optional: return the saved preferences
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+//    @PostMapping("/{userId}")
+//    public ResponseEntity<Map<String, Object>> saveUserPreferences(@PathVariable String userId, @RequestBody List<UserPreferenceRequest> preferences) {        userPreferenceService.saveUserPreferences(userId, preferences);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "User Preferences saved successfully");
+//        response.put("userId", userId);
+//        response.put("savedPreferences", preferences);  // Optional: return the saved preferences
+//
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
     // Endpoint to retrieve preferences for a specific user
     @GetMapping("/{userId}")
     public ResponseEntity<List<UserPreferenceDTO>> getUserPreferences(@PathVariable String userId) {
         List<UserPreferenceDTO> preferences = userPreferenceService.getUserPreferences(userId);
         return new ResponseEntity<>(preferences, HttpStatus.OK);
     }
+
+    @PostMapping("/{userId}")
+    public ResponseEntity<Map<String, Object>> saveUserPreferences(
+            @PathVariable String userId,
+            @RequestBody List<UserPreferenceRequest> preferences) {
+        userPreferenceService.saveUserPreferences(userId, preferences);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "User Preferences saved successfully");
+        response.put("userId", userId);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
 
 }

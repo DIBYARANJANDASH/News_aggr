@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-more-btn').addEventListener('click', () => {
         window.location.href = './preferences.html';
     });
+
+    document.getElementById('save-priority-btn').addEventListener('click', () => {
+        console.log("Button hit");
+        savePreferencePriority(userId, token);
+    });
 });
 
 /// Function to fetch user details
@@ -80,78 +85,115 @@ function updateUserInfo(userId, token) {
     .catch(error => console.error('Error updating user info:', error));
 }
 
-// Function to fetch and display user preferences separately (if needed)
+
 function fetchAndDisplayPreferences(userId, token) {
     fetch(`${apiUrl}/preferences/${userId}`, {
-        method: 'GET',
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) throw new Error("Failed to fetch preferences");
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Fetched Preferences:", data);
+            displayPreferences(data);
+        })
+        .catch((error) => console.error("Error fetching preferences:", error));
+}
+
+
+
+
+function displayPreferences(preferences) {
+    if (!Array.isArray(preferences)) {
+        console.error("Invalid preferences data:", preferences);
+        return; // Exit if preferences is not an array
+    }
+
+    const preferencesContainer = document.getElementById("preferences-list");
+
+    if (!preferencesContainer) {
+        console.error("Element with ID 'preferences-list' not found");
+        return; // Exit if container element is not found
+    }
+
+    preferencesContainer.innerHTML = ""; // Clear existing preferences
+
+    // Sort preferences by priority in ascending order
+    preferences.sort((a, b) => a.priority - b.priority);
+
+    preferences.forEach((pref) => {
+        const prefItem = document.createElement("li");
+        prefItem.classList.add("preference-item");
+        prefItem.draggable = true;
+        prefItem.dataset.subcategoryId = pref.subCategoryId;
+
+        prefItem.innerText = `${pref.categoryName} - ${pref.subCategoryName}`;
+
+        prefItem.addEventListener("dragstart", handleDragStart);
+        prefItem.addEventListener("dragover", handleDragOver);
+        prefItem.addEventListener("drop", handleDrop);
+        prefItem.addEventListener("dragleave", handleDragLeave);
+
+        preferencesContainer.appendChild(prefItem);
+    });
+}
+
+function savePreferencePriority(userId, token) {
+    const preferenceItems = Array.from(document.querySelectorAll('#preferences-list .preference-item'));
+    
+    // Map the preferences to an array of objects with updated priority
+    const preferences = preferenceItems.map((item, index) => ({
+        subcategoryId: item.dataset.subcategoryId, // Use data-subcategory-id
+        priority: index + 1, // Set priority based on the new order (index + 1 for ascending order)
+    }));
+
+    // Send the updated preferences to the backend
+    fetch(`${apiUrl}/preferences/${userId}`, {
+        method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(preferences)
     })
     .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch preferences');
-        return response.json();
+        if (!response.ok) throw new Error('Failed to save preferences');
+        alert('Preferences saved successfully');
     })
-    .then(data => {
-        displayPreferences(data);  // Pass the data to displayPreferences
-    })
-    .catch(error => console.error('Error fetching preferences:', error));
-}
-
-// Function to display user preferences with draggable feature
-function displayPreferences(preferences) {
-    const preferencesContainer = document.getElementById('preferences-lsit');
-    preferencesContainer.innerHTML = ''; // Clear existing preferences
-
-    if (preferences !== undefined) {
-        preferences.forEach(pref => {
-            const prefItem = document.createElement('li');
-            prefItem.classList.add('preference-item');
-            prefItem.draggable = true; // Make the item draggable
-
-            // Display category and subcategory names (ensure these match your DTO field names)
-            prefItem.innerText = `${pref.categoryName} - ${pref.subCategoryName}`;
-
-            // Add drag and drop event listeners
-            prefItem.addEventListener('dragstart', handleDragStart);
-            prefItem.addEventListener('dragover', handleDragOver);
-            prefItem.addEventListener('drop', handleDrop);
-            prefItem.addEventListener('dragleave', handleDragLeave);
-
-            preferencesContainer.appendChild(prefItem);
-        });
-    }
+    .catch(error => console.error('Error saving preferences:', error));
 }
 
 // Drag and Drop Handlers
 let draggedItem = null;
 
 function handleDragStart(e) {
-    draggedItem = e.target; // Set the dragged item
-    e.target.style.opacity = '0.5'; // Visual feedback
-    e.dataTransfer.effectAllowed = 'move'; // Indicate the type of operation
+    draggedItem = e.target;
+    e.target.style.opacity = '0.5';
 }
 
 function handleDragOver(e) {
-    e.preventDefault(); // Allow the drop
-    e.target.classList.add('over'); // Add a visual highlight to the drop target
+    e.preventDefault();
+    e.target.classList.add('over');
 }
 
 function handleDrop(e) {
     e.preventDefault();
-    e.target.classList.remove('over'); // Remove the visual highlight
+    e.target.classList.remove('over');
 
     if (draggedItem !== e.target) {
         const parent = e.target.parentNode;
-        parent.insertBefore(draggedItem, e.target); // Move the dragged item to its new position
+        parent.insertBefore(draggedItem, e.target);
     }
 }
 
 function handleDragLeave(e) {
-    e.target.classList.remove('over'); // Remove the visual highlight when leaving a drop target
+    e.target.classList.remove('over');
 }
-
 
 
 // Function to update password

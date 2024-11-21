@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity, String> {
@@ -14,4 +15,6 @@ public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity,
     List<UserPreferencesEntity> findByUser_userId(String userId);
 
     boolean existsByUserAndSubCategory(UserEntity user, SubCategoryEntity subCategory);
+    Optional<UserPreferencesEntity> findByUserAndSubCategory(UserEntity user, SubCategoryEntity subCategory);
+
 }

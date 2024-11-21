@@ -29,26 +29,26 @@ public class UserPreferenceService {
     }
 
     // Updated method to include priority
-    public void saveUserPreferences(String userId, List<UserPreferenceRequest> preferences) {
-        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-        for (UserPreferenceRequest preferenceRequest : preferences) {
-            SubCategoryEntity subCategory = subCategoryRepo.findById(preferenceRequest.getSubcategoryId())
-                    .orElseThrow(() -> new RuntimeException("Subcategory not found"));
-
-            boolean exists = userPreferenceRepo.existsByUserAndSubCategory(user, subCategory);
-            if (!exists) {
-                UserPreferencesEntity preference = new UserPreferencesEntity();
-                preference.setUser(user);
-                preference.setSubCategory(subCategory);
-                preference.setPriority(preferenceRequest.getPriority());
-                preference.setCreatedAt(LocalDateTime.now());
-                preference.setUpdatedAt(LocalDateTime.now());
-
-                userPreferenceRepo.save(preference);
-            }
-        }
-    }
+//    public void saveUserPreferences(String userId, List<UserPreferenceRequest> preferences) {
+//        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        for (UserPreferenceRequest preferenceRequest : preferences) {
+//            SubCategoryEntity subCategory = subCategoryRepo.findById(preferenceRequest.getSubcategoryId())
+//                    .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+//
+//            boolean exists = userPreferenceRepo.existsByUserAndSubCategory(user, subCategory);
+//            if (!exists) {
+//                UserPreferencesEntity preference = new UserPreferencesEntity();
+//                preference.setUser(user);
+//                preference.setSubCategory(subCategory);
+//                preference.setPriority(preferenceRequest.getPriority());
+//                preference.setCreatedAt(LocalDateTime.now());
+//                preference.setUpdatedAt(LocalDateTime.now());
+//
+//                userPreferenceRepo.save(preference);
+//            }
+//        }
+//    }
 
     public List<UserPreferenceDTO> getUserPreferences(String userId) {
         List<UserPreferencesEntity> preferences = userPreferenceRepo.findByUser_userId(userId);
@@ -62,7 +62,33 @@ public class UserPreferenceService {
         UserPreferenceDTO dto = new UserPreferenceDTO();
         dto.setCategoryName(preference.getSubCategory().getCategory().getCategoryName());  // Ensure correct getter chain
         dto.setSubCategoryName(preference.getSubCategory().getSubcategoryName());
+        dto.setSubCategoryId(preference.getSubCategory().getSubcategoryId());
         dto.setPriority(preference.getPriority());
         return dto;
+    }
+
+
+    public void saveUserPreferences(String userId, List<UserPreferenceRequest> preferences) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        for (UserPreferenceRequest preferenceRequest : preferences) {
+            SubCategoryEntity subCategory = subCategoryRepo.findById(preferenceRequest.getSubcategoryId())
+                    .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+
+            UserPreferencesEntity preference = userPreferenceRepo.findByUserAndSubCategory(user, subCategory)
+                    .orElseGet(() -> new UserPreferencesEntity());
+
+            preference.setUser(user);
+            preference.setSubCategory(subCategory);
+            preference.setPriority(preferenceRequest.getPriority());
+            preference.setUpdatedAt(LocalDateTime.now());
+
+            if (preference.getCreatedAt() == null) {
+                preference.setCreatedAt(LocalDateTime.now());
+            }
+
+            userPreferenceRepo.save(preference);
+        }
     }
 }
