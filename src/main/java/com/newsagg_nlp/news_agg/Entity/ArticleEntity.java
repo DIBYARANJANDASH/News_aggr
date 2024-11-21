@@ -5,12 +5,15 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.time.LocalDateTime;
 
 @Data
 @Document(collection = "articles")
-public class ArticleEntity {
+public class ArticleEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
     private String articleId;
     private String title;
@@ -27,7 +30,7 @@ public class ArticleEntity {
 
     // Nested Source class to match the API response structure
     @Data
-    public static class Source {
+    public static class Source implements Serializable {
         private String id;
         private String name;
     }

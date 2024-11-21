@@ -44,5 +44,17 @@ public class ArticleController {
         }
         return ResponseEntity.ok(articles);
     }
+
+    @DeleteMapping("/cache/articleSub/{subcategoryId}")
+    public ResponseEntity<String> clearCacheForSubcategory(@PathVariable String subcategoryId) {
+        articleService.evictCacheForSubcategory(subcategoryId);
+        return ResponseEntity.ok("Cache cleared for subcategory: " + subcategoryId);
+    }
+
+    @DeleteMapping("/cache/preferences/{userId}")
+    public ResponseEntity<String> clearCacheForUserPreferences(@PathVariable String userId) {
+        articleService.evictCacheForUserPreferences(userId);
+        return ResponseEntity.ok("Cache cleared for user preferences: " + userId);
+    }
 }
 
