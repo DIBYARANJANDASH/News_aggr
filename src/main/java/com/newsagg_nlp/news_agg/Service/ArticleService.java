@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,7 +31,7 @@ public class ArticleService {
     private final UserPreferenceRepo userPreferenceRepo;
     private final RestTemplate restTemplate;
 
-    private static final Duration EXPIRY_DURATION = Duration.ofDays(2); // Expiry duration for articles
+    private static final Duration CACHE_EXPIRY = Duration.ofHours(6);
 
     @Autowired
     public ArticleService(ArticleRepo articleRepo, SubCategoryRepo subCategoryRepo, RestTemplate restTemplate,
@@ -42,74 +43,80 @@ public class ArticleService {
     }
 
     /**
-     * Fetch articles from an API and store them in the database if they are outdated.
-     *
-     * @param category    The category parameter for the API.
-     * @param subcategory The subcategory parameter for the API.
-     * @return List of saved ArticleEntity objects.
+     * Fetch articles from an API and store them in Redis and DB.
      */
     @Cacheable(value = "articles", key = "#subcategory")
     public List<ArticleEntity> fetchArticlesFromApi(String category, String subcategory) {
         logger.info("Fetching articles for subcategory: {}", subcategory);
 
+        // Fetch subcategory ID
         Optional<SubCategoryEntity> subCategoryEntityOpt = Optional.ofNullable(subCategoryRepo.findBySubcategoryName(subcategory));
         if (subCategoryEntityOpt.isEmpty()) {
-            logger.warn("Subcategory ID not found for: {}", subcategory);
-            return List.of(); // Return an empty list if subcategory is not found
+            logger.warn("Subcategory not found: {}", subcategory);
+            return List.of(); // Return empty list if subcategory is not found
         }
 
         String subcategoryId = subCategoryEntityOpt.get().getSubcategoryId();
 
-        // Check if existing articles for this subcategory are outdated
+        // Check if articles are outdated
         boolean isDataOutdated = articleRepo.findBySubcategoryId(subcategoryId).stream()
                 .map(ArticleEntity::getPublishedAt)
                 .max(LocalDateTime::compareTo)
-                .map(latestDate -> Duration.between(latestDate, LocalDateTime.now()).compareTo(EXPIRY_DURATION) > 0)
+                .map(latestDate -> Duration.between(latestDate, LocalDateTime.now()).compareTo(Duration.ofDays(2)) > 0)
                 .orElse(true);
 
         if (!isDataOutdated) {
-            logger.info("Using cached articles for subcategory: {}", subcategory);
-            return articleRepo.findBySubcategoryId(subcategoryId); // Return existing articles if they are not outdated
+            return articleRepo.findBySubcategoryId(subcategoryId);
         }
 
-        // If data is outdated, fetch new articles from the API
-        String apiUrl = "https://gnews.io/api/v4/search?q=" + subcategory + "&apikey=b30033fd80f44a50cec737303c807bd8&lang=en";
+        // Fetch new articles from API
+        String apiUrl = "https://gnews.io/api/v4/search?q=" + subcategory + "&apikey=c7f190a49c23892f1c54651e485e482a&lang=en";
         ResponseEntity<NewsApiResponse> response = restTemplate.getForEntity(apiUrl, NewsApiResponse.class);
 
         NewsApiResponse newsApiResponse = response.getBody();
         if (newsApiResponse != null && newsApiResponse.getArticles() != null) {
             List<ArticleEntity> newArticles = newsApiResponse.getArticles();
 
-            // Set subcategoryId for each article
-            newArticles.forEach(article -> article.setSubcategoryId(subcategoryId));
+            // Save articles to database
+            articleRepo.saveAll(newArticles);
 
-            // Filter only new articles to avoid duplication
-            List<ArticleEntity> existingArticles = articleRepo.findBySubcategoryId(subcategoryId);
-            List<ArticleEntity> articlesToSave = newArticles.stream()
-                    .filter(newArticle -> existingArticles.stream()
-                            .noneMatch(existing -> existing.getTitle().equals(newArticle.getTitle())))
-                    .collect(Collectors.toList());
+            // Clear cache for this subcategory
+            clearCache(subcategory);
 
-            if (!articlesToSave.isEmpty()) {
-                logger.info("Saving new articles for subcategory: {}", subcategory);
-                articleRepo.saveAll(articlesToSave); // Save only non-duplicate articles
-            } else {
-                logger.info("No new articles to save for subcategory: {}", subcategory);
-            }
-
-            return articleRepo.findBySubcategoryId(subcategoryId); // Return all articles
+            return newArticles;
         }
 
         logger.warn("No articles fetched from API for subcategory: {}", subcategory);
         return List.of();
     }
 
-    /**
-     * Get articles based on user preferences, fetching new ones if the existing ones are outdated.
-     *
-     * @param userId The ID of the user whose preferences will be used to fetch articles.
-     * @return List of articles based on user preferences.
-     */
+    private List<ArticleEntity> filterDuplicateArticles(List<ArticleEntity> newArticles, String subcategoryId) {
+        List<ArticleEntity> existingArticles = articleRepo.findBySubcategoryId(subcategoryId);
+        return newArticles.stream()
+                .filter(newArticle -> existingArticles.stream()
+                        .noneMatch(existing -> existing.getTitle().equals(newArticle.getTitle())))
+                .collect(Collectors.toList());
+    }
+
+    @Scheduled(fixedRate = 6 * 60 * 60 * 1000) //
+    public void updateNewsForAllSubcategories() {
+        logger.info("Scheduled task: Fetching fresh news for all subcategories...");
+
+        List<SubCategoryEntity> subcategories = subCategoryRepo.findAll();
+        subcategories.forEach(subCategory -> {
+            fetchArticlesFromApi(subCategory.getCategory().getCategoryName(), subCategory.getSubcategoryName());
+        });
+
+        logger.info("Scheduled task completed.");
+    }
+
+    public void updateNewsForSubcategory(String subcategoryId) {
+        SubCategoryEntity subCategory = subCategoryRepo.findById(subcategoryId)
+                .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+
+        fetchArticlesFromApi(subCategory.getCategory().getCategoryName(), subCategory.getSubcategoryName());
+    }
+
     @Cacheable(value = "articlesBySubcategory", key = "#subcategoryId")
     public List<ArticleEntity> getArticlesBySubcategory(String subcategoryId) {
         logger.info("Fetching articles for subcategory ID: {}", subcategoryId);
@@ -120,34 +127,52 @@ public class ArticleService {
     public List<ArticleEntity> getArticlesByUserPreferences(String userId) {
         logger.info("Fetching articles for user ID: {}", userId);
 
-        // Fetch articles based on user preferences
-        List<UserPreferencesEntity> userPreferences = userPreferenceRepo.findByUser_userId(userId);
+        // Fetch user preferences ordered by priority
+        List<UserPreferencesEntity> userPreferences = userPreferenceRepo.findByUser_userIdOrderByPriorityAsc(userId); // Using ordered repository method
         if (userPreferences.isEmpty()) {
             logger.warn("No preferences found for user ID: {}", userId);
             return List.of();
         }
 
-        Set<String> uniqueSubCategoryIds = userPreferences.stream()
-                .map(preference -> preference.getSubCategory().getSubcategoryId())
-                .collect(Collectors.toSet());
+        // Fetch articles for each subcategory in priority order
+        List<ArticleEntity> prioritizedArticles = new ArrayList<>();
+        for (UserPreferencesEntity preference : userPreferences) {
+            String subCategoryId = preference.getSubCategory().getSubcategoryId();
+            String categoryName = preference.getSubCategory().getCategory().getCategoryName();
+            String subCategoryName = preference.getSubCategory().getSubcategoryName();
 
-        return uniqueSubCategoryIds.stream()
-                .flatMap(subcategoryId -> fetchArticlesFromApi(
-                        subCategoryRepo.findById(subcategoryId).get().getCategory().getCategoryName(),
-                        subCategoryRepo.findById(subcategoryId).get().getSubcategoryName()
-                ).stream())
-                .collect(Collectors.toList());
+            // Check if articles are available in the database
+            List<ArticleEntity> articlesForSubcategory = articleRepo.findBySubcategoryId(subCategoryId);
+
+            if (!articlesForSubcategory.isEmpty()) {
+                // Add articles from the database
+                logger.info("Adding articles from DB for subcategory: {}", subCategoryName);
+                prioritizedArticles.addAll(articlesForSubcategory);
+            } else {
+                // Fetch articles from API and save to the database
+                logger.info("Fetching articles from API for subcategory: {}", subCategoryName);
+                List<ArticleEntity> fetchedArticles = fetchArticlesFromApi(categoryName, subCategoryName);
+                if (!fetchedArticles.isEmpty()) {
+                    prioritizedArticles.addAll(fetchedArticles);
+                }
+            }
+        }
+
+        return prioritizedArticles;
     }
+
 
     @CacheEvict(value = "articlesBySubcategory", key = "#subcategoryId")
     public void evictCacheForSubcategory(String subcategoryId) {
         logger.info("Evicting cache for subcategory ID: {}", subcategoryId);
-        // Method to clear cache for a specific subcategory
     }
 
     @CacheEvict(value = "articlesByPreferences", key = "#userId")
     public void evictCacheForUserPreferences(String userId) {
-        logger.info("Evicting cache for user ID: {}", userId);
-        // Method to clear cache for user preferences
+        logger.info("Evicting cache for user preferences: {}", userId);
+    }
+    @CacheEvict(value = "articles", key = "#subcategory")
+    public void clearCache(String subcategory) {
+        logger.info("Clearing cache for subcategory: {}", subcategory);
     }
 }

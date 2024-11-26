@@ -232,9 +232,3 @@ function updatePassword(userId, token) {
 function redirectToNewsFeed() {
     window.location.href = "newsFeed.html";
 }
-
-
-
-function redirectToNewsFeed() {
-    window.location.href = "newsFeed.html";
-}

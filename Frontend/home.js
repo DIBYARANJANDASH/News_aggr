@@ -201,7 +201,8 @@
 const container = document.querySelector(".container");
 
 // GNews API endpoint
-let requestURL = `https://gnews.io/api/v4/search?q=%22top-headlines%22&apikey=b30033fd80f44a50cec737303c807bd8&lang=en`;
+let requestURL = `https://gnews.io/api/v4/search?q=%22top-headlines%22&apikey=c7f190a49c23892f1c54651e485e482a
+&lang=en`;
 
 // Create news cards from data
 const generateUI = (articles) => {

@@ -1,7 +1,6 @@
 package com.newsagg_nlp.news_agg.Controller;
 
 import com.newsagg_nlp.news_agg.Entity.ArticleEntity;
-import com.newsagg_nlp.news_agg.Entity.UserPreferencesEntity;
 import com.newsagg_nlp.news_agg.Service.ArticleService;
 import com.newsagg_nlp.news_agg.Service.UserPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +22,15 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
-
     @GetMapping("/articleSub")
     public List<ArticleEntity> getArticlesBySubcategory(@RequestParam String subcategoryId) {
         return articleService.getArticlesBySubcategory(subcategoryId);
     }
 
     @PostMapping("/fetch")
-    public List<ArticleEntity> fetchArticles(@RequestParam String category, @RequestParam String subcategory) {
+    public ResponseEntity<List<ArticleEntity>> fetchArticles(@RequestParam String category, @RequestParam String subcategory) {
         List<ArticleEntity> storeArticles = articleService.fetchArticlesFromApi(category, subcategory);
-        return new ResponseEntity<>(storeArticles, HttpStatus.CREATED).getBody();
+        return ResponseEntity.status(HttpStatus.CREATED).body(storeArticles);
     }
 
     @GetMapping("/preferences/{userId}")
@@ -56,5 +54,10 @@ public class ArticleController {
         articleService.evictCacheForUserPreferences(userId);
         return ResponseEntity.ok("Cache cleared for user preferences: " + userId);
     }
-}
 
+    @PostMapping("/update/{subcategoryId}")
+    public ResponseEntity<String> updateNewsForSubcategory(@PathVariable String subcategoryId) {
+        articleService.updateNewsForSubcategory(subcategoryId);
+        return ResponseEntity.ok("News updated for subcategory: " + subcategoryId);
+    }
+}

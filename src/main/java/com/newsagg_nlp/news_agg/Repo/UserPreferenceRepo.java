@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface UserPreferenceRepo extends JpaRepository<UserPreferencesEntity, String> {
 
     List<UserPreferencesEntity> findByUser_userId(String userId);
+    List<UserPreferencesEntity> findByUser_userIdOrderByPriorityAsc(String userId); // Fetch preferences sorted by priority
+
 
     boolean existsByUserAndSubCategory(UserEntity user, SubCategoryEntity subCategory);
     Optional<UserPreferencesEntity> findByUserAndSubCategory(UserEntity user, SubCategoryEntity subCategory);
