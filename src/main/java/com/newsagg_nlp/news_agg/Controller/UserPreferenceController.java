@@ -5,6 +5,7 @@ import com.newsagg_nlp.news_agg.dto.UserPreferenceRequest;
 import com.newsagg_nlp.news_agg.Service.UserPreferenceService;
 import com.newsagg_nlp.news_agg.dto.UserPreferenceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,12 @@ public class UserPreferenceController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @DeleteMapping("/cache/{userId}")
+    @CacheEvict(value = "articlesByPreferences", key = "#userId") // Clear cache for the user
+    public ResponseEntity<String> clearUserPreferencesCache(@PathVariable String userId) {
+        return ResponseEntity.ok("Cache cleared for user preferences: " + userId);
+    }
 
 
 }
+

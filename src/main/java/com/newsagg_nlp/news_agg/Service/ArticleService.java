@@ -70,7 +70,7 @@ public class ArticleService {
         }
 
         // Fetch new articles from API
-        String apiUrl = "https://gnews.io/api/v4/search?q=" + subcategory + "&apikey=c7f190a49c23892f1c54651e485e482a&lang=en";
+        String apiUrl = "https://gnews.io/api/v4/search?q=" + subcategory + "&apikey=f0340de4da4a90909cc6787aefbc2691&lang=en";
         ResponseEntity<NewsApiResponse> response = restTemplate.getForEntity(apiUrl, NewsApiResponse.class);
 
         NewsApiResponse newsApiResponse = response.getBody();
